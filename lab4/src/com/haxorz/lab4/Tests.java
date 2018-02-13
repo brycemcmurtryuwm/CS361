@@ -7,20 +7,20 @@ import static org.junit.Assert.*;
 
 
 public class Tests {
-    private Customer customer;
+    private Customer customer80;
+    private Customer customer0;
+    private Customer customer100;
     private ATM atm;
-    private Account acct;
     private Bank bank;
-    private Card card;
 
     @Before
     public void setup(){
+        customer80 = new Customer(new Card(12345), new Account(1234,000,80));
+        customer0 = new Customer(new Card(12345), new Account(1235,000,0));
+        customer100 = new Customer(new Card(12345), new Account(1236,000,100));
 
-        customer = new Customer();
         atm = new ATM();
-        acct = new Account();
         bank = new Bank();
-        card =  new Card();
     }
 
     @Test

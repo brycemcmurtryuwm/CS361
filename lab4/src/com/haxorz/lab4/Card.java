@@ -6,5 +6,10 @@ public class Card {
 
     public double AcctNum;
 
+    public Card(double acctNum){
+
+    }
+
+
 
 }
