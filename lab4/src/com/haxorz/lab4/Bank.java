@@ -8,4 +8,8 @@ public class Bank {
 	public boolean validate(Account) {
 		
 	}
+
+	public boolean acctExists(){
+
+    }
 }

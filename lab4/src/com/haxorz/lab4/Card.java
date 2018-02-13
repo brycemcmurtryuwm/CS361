@@ -4,6 +4,7 @@ public class Card {
 
     //account Num
 
+    public double AcctNum;
 
 
 }
