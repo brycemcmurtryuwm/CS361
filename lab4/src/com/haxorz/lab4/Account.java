@@ -24,9 +24,11 @@ public class Account {
 	public double getBalance(){
 		return balance;
 	}
+
 	public void deposit(double amount){
 		balance += amount;
-	}
+	} //throw illegal
+
 	public double withdraw(double amount){
 		if(amount < 0) throw new IllegalArgumentException();
 		if(amount <= balance){

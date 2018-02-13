@@ -7,12 +7,90 @@ import static org.junit.Assert.*;
 
 
 public class Tests {
-    Customer scoreSheet;
+    private Customer customer;
+    private ATM atm;
+    private Account acct;
+    private Bank bank;
+    private Card card;
 
     @Before
     public void setup(){
-        scoreSheet = new ScoreSheet();
+
+        customer = new Customer();
+        atm = new ATM();
+        acct = new Account();
+        bank = new Bank();
+        card =  new Card();
     }
+
+    @Test
+    public void testOneThrow() {
+        //test a single throw and check scoring for the first frame and game
+        double amountWithacct.withdrawl();
+
+        try {
+            scoreSheet.throwBall(ballThrow.EIGHT);
+        } catch (IllegalThrowException e) {
+            fail(e.getMessage());
+        }
+
+        try {
+            assertEquals(8, scoreSheet.getFrameScore(0));
+            assertEquals(8, scoreSheet.getTotalScore());
+        } catch (IllegalScoreException e) {
+            fail(e.getMessage());
+        }
+
+    }
+
+
+    //withdrawl
+        //no money
+        // invalid number
+        //money
+        //all money
+        //isufficiemt funds
+
+    //deposit
+        //no moneu
+        //some money
+        //invalid num
+
+    //account num doesnt exist
+    //pin doesnt match acct
+    //pin does match acct
+    //retiree balance
+
+
+
+    //
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     @Test
     public void testOneThrow() {
