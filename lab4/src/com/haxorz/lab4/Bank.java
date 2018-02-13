@@ -1,25 +1,22 @@
 package com.haxorz.lab4;
 
-import java.util.Dictionary;
+import java.util.HashMap;
 
 public class Bank {
 
-    private final Dictionary<double, Account> accts;
-    private Account 1234 = new Account();
-	private Account 6789 = new Account();
-
-	public Bank(Dictionary<double, Account> accts){
+    private final HashMap<String, Account> accts;
+    
+	public Bank(HashMap<String, Account> accts){
 
         this.accts = accts;
     }
 
-
 	//validate(account)
-	public boolean validate(Account) {
-		
+	public boolean validate(Account temp) {
+		return acctExists(temp);
 	}
 
-	public boolean acctExists(){
-
+	public boolean acctExists(Account temp){
+		return accts.containsKey(Long.toString(temp.getAccountNumber()));
     }
 }

@@ -37,4 +37,8 @@ public class Account {
 		}
 		return 0;
 	}
+	
+	public long getAccountNumber() {
+		return accountNumber;
+	}
 }
