@@ -1,112 +1,157 @@
 package com.haxorz.lab4;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.math.BigDecimal;
 import java.util.Scanner;
 
 public class driver {
 	public static void main(String[] args){
+		startDriver(System.in, System.out);
+	}
+	
+	public static void startDriver(InputStream in, PrintStream out){
 		ATM atm = new ATM();
-
+		
 		outerloop:
 		while(true){
-			Scanner sc = new Scanner(System.in);
+			Scanner sc = new Scanner(in);
+			atm.start();
 			long acctNum;
 
-			System.out.println("Welcome to the ATM.");
+			out.println("Welcome to the ATM.");
 			while(true){
-				System.out.println("Please enter your card number : ");
+				out.println("Please enter your card number : ");
 				String tmp = sc.next();
 				try{
 					acctNum = Long.parseLong(tmp);
 					break;
 				}catch(NumberFormatException e){
-					System.out.println("That account number wasn't valid.");
+					out.println("That account number wasn't valid.");
 					continue;
 				}
 			}
 			if(!atm.EnterAcctNum(acctNum)){
-				System.out.println("No account found!");
+				out.println("No account found!");
 				continue;
 			}
 			int attempts = 0;
 			int pin;
 			while(true){
-				System.out.println("Enter PIN : ");
+				out.println("Enter PIN : ");
 				String tmp = sc.next();
 				try{
 					pin = Integer.parseInt(tmp);
 				}catch(NumberFormatException e){
-					System.out.println("That PIN wasn't valid. Try again : ");
+					out.println("That PIN wasn't valid. Try again : ");
 					continue;
 				}
 				if(!atm.EnterPIN(pin) && attempts > 5){
-					System.out.println("Too many wrong pin attempts.");
+					out.println("Too many wrong pin attempts.");
 					continue outerloop;
 				}
 				else if(!atm.EnterPIN(pin)){
 					++attempts;
-					System.out.println("Wrong PIN.");
+					out.println("Wrong PIN.");
 					continue;
 				}
 				break;
 			}
-			int transactionType;
+
 			selectType:
 			while(true){
-				System.out.println("Enter deposit or withdrawl :");
+				out.println("Enter balance, deposit or withdrawl :");
 				String tmp = sc.next();
 				switch(tmp.toLowerCase()){
+					case "balance":
+					case "b":
+						balance(atm, out);
+						if (!makeAnotherTrans(sc, out))
+							break selectType;
+						break;
+					case "d":
 					case "deposit" :
-						transactionType = 0;
-						break selectType;
+						deposit(sc, out, atm);
+						balance(atm, out);
+						if (!makeAnotherTrans(sc, out))
+							break selectType;
+						break;
+					case "w":
 					case "withdrawl" :
-						transactionType = 1;
-						break selectType;
+						withdrawl(sc, out, atm);
+						balance(atm, out);
+						if (!makeAnotherTrans(sc, out))
+							break selectType;
+						break;
 					default :
+						out.println("That isn't a valid transaction type.");
 						break;
 				}
-				System.out.println("That isn't a valid transaction type.");
-			}
-			switch(transactionType){
-				case 0:
-					deposit(sc, atm);
-					break;
-				case 1:
-					withdrawl(sc, atm);
-					break;
 			}
 		}
 	}
-	public static double askForAmount(Scanner sc){
+
+	private static void balance(ATM atm, PrintStream out) {
+		try {
+			BigDecimal balance = atm.getBalance();
+
+			out.println("Current Balance: $" + balance);
+		} catch (Exception e) {
+			out.println("There was an error in retrieving your account information.");
+			out.println(e.getMessage());
+		}
+	}
+
+	private static boolean makeAnotherTrans(Scanner sc, PrintStream out) {
+		while(true){
+			out.println("Would you like to make another transaction (y/n):");
+			String tmp = sc.next().toLowerCase();
+			if("y".equals(tmp)){
+					return true;
+			}
+			else if("n".equals(tmp)){
+				return false;
+			}
+		}
+	}
+
+	private static BigDecimal askForAmount(Scanner sc, PrintStream out){
 		double amount;
 		while(true){
-			System.out.println("Enter the amount :");
+			out.println("Enter the amount :");
 			String tmp = sc.next();
 			try{
 				amount = Double.parseDouble(tmp);
-			}catch(NumberFormatException e){}
-			System.out.println("That isn't a valid amount.");
+				return BigDecimal.valueOf(amount);
+			}catch(NumberFormatException e){
+				out.println("That isn't a valid amount.");
+			}
 		}
 	}
-	public static boolean deposit(Scanner sc, ATM atm){
-		double amount = askForAmount(sc);
+
+	private static boolean deposit(Scanner sc, PrintStream out, ATM atm){
+		BigDecimal amount = askForAmount(sc, out);
 		try {
 			atm.deposit(amount);
-			System.out.println("Deposited $" + amount + " to account.");
+			out.println("Deposited $" + amount + " to account.");
 			return true;
 		}
 		catch(Exception e){
-			System.out.println("Deposit was not successful");
+			out.println("Deposit was not successful");
+			out.println(e.getMessage());
 			return false;
 		}
 	}
-	public static boolean withdrawl(Scanner sc, ATM atm){
-		double amount = askForAmount(sc);
+
+	private static boolean withdrawl(Scanner sc, PrintStream out, ATM atm){
+		BigDecimal amount = askForAmount(sc, out);
 		try {
 			atm.withdraw(amount);
-			System.out.println("Withdrew $" + amount + " from account.");
+			out.println("Withdrew $" + amount + " from account.");
 			return true;
 		}
 		catch(Exception e){
-			System.out.println("Withdrawl was not successful");
+			out.println("Withdraw was not successful");
+			out.println(e.getMessage());
 			return false;
 		}
 	}

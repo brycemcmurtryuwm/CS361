@@ -3,46 +3,176 @@ package com.haxorz.lab4;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import java.math.BigDecimal;
+import java.util.HashMap;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 
 public class Tests {
     private Customer customer80;
     private Customer customer0;
-    private Customer customer100;
+    private Customer customer60;
+    private Customer noExistCust;
     private ATM atm;
-    private Bank bank;
+
+
+    //tests
+    //console input
+    //units tests
 
     @Before
     public void setup(){
-        customer80 = new Customer(new Card(12345), new Account(1234,000,80));
-        customer0 = new Customer(new Card(12345), new Account(1235,000,0));
-        customer100 = new Customer(new Card(12345), new Account(1236,000,100));
+        customer80 = new Customer(new Card(1234), 6789);
+        customer0 = new Customer(new Card(1235), 0000);
+        customer60 = new Customer(new Card(6789), 4321);
+        noExistCust = new Customer(new Card(12390), 0000);
 
         atm = new ATM();
-        bank = new Bank();
+        atm.start();
+    }
+
+    //region Withdraw Tests
+    @Test
+    public void withdrawNoMoney() {
+        atm.EnterAcctNum(customer0.card.AcctNum());
+        atm.EnterPIN(customer0.PIN);
+        try {
+            atm.withdraw(BigDecimal.ZERO);
+            assertEquals(BigDecimal.ZERO,atm.getBalance());
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+
     }
 
     @Test
-    public void testOneThrow() {
-        //test a single throw and check scoring for the first frame and game
-        double amountWithacct.withdrawl();
-
+    public void withdrawNegativeNumber() {
+        atm.EnterAcctNum(customer0.card.AcctNum());
+        atm.EnterPIN(customer0.PIN);
         try {
-            scoreSheet.throwBall(ballThrow.EIGHT);
-        } catch (IllegalThrowException e) {
-            fail(e.getMessage());
+            atm.withdraw(BigDecimal.valueOf(-10));
+            fail("Withdrew a negative amount");
+        } catch (Exception e) {
+            assertEquals(1,1);
         }
 
+    }
+
+    @Test
+    public void withdrawMoney() {
+        atm.EnterAcctNum(customer80.card.AcctNum());
+        atm.EnterPIN(customer80.PIN);
         try {
-            assertEquals(8, scoreSheet.getFrameScore(0));
-            assertEquals(8, scoreSheet.getTotalScore());
-        } catch (IllegalScoreException e) {
+            atm.withdraw(BigDecimal.valueOf(60));
+            assertEquals(BigDecimal.valueOf(20),atm.getBalance());
+        } catch (Exception e) {
             fail(e.getMessage());
         }
 
     }
 
+    @Test
+    public void withdrawAllMoney() {
+        atm.EnterAcctNum(customer60.card.AcctNum());
+        atm.EnterPIN(customer60.PIN);
+        try {
+            atm.withdraw(BigDecimal.valueOf(60));
+            assertEquals(BigDecimal.ZERO,atm.getBalance());
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+
+    }
+
+    @Test
+    public void withdrawInsufficientFunds() {
+        atm.EnterAcctNum(customer80.card.AcctNum());
+        atm.EnterPIN(customer80.PIN);
+        try {
+            atm.withdraw(BigDecimal.valueOf(100));
+            fail("Insuffient Funds");
+        } catch (Exception e) {
+            assertEquals(1,1);
+        }
+
+    }
+    //endregion
+
+    //region deposit
+    @Test
+    public void depositNoMoney() {
+        atm.EnterAcctNum(customer80.card.AcctNum());
+        atm.EnterPIN(customer80.PIN);
+        try {
+            atm.deposit(BigDecimal.valueOf(0));
+            assertEquals(BigDecimal.valueOf(80),atm.getBalance());
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void depositMoney() {
+        atm.EnterAcctNum(customer60.card.AcctNum());
+        atm.EnterPIN(customer60.PIN);
+        try {
+            atm.deposit(BigDecimal.valueOf(40));
+            assertEquals(BigDecimal.valueOf(100),atm.getBalance());
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void depositInvalid() {
+        atm.EnterAcctNum(customer80.card.AcctNum());
+        atm.EnterPIN(customer80.PIN);
+        try {
+            atm.deposit(BigDecimal.valueOf(-10));
+            fail("Cannot deposit an invalid number");
+        } catch (Exception e) {
+            assertEquals(1,1);
+        }
+    }
+    //endregion
+
+    @Test
+    public void AccountExists() {
+        assertEquals(true, atm.EnterAcctNum(customer80.card.AcctNum()));
+    }
+
+    @Test
+    public void AccountDoesntExists() {
+        assertEquals(false, atm.EnterAcctNum(noExistCust.card.AcctNum()));
+    }
+
+
+    @Test
+    public void ValidPIN() {
+        atm.EnterAcctNum(customer80.card.AcctNum());
+        assertEquals(true, atm.EnterPIN(customer80.PIN));
+    }
+
+    @Test
+    public void InvalidPIN() {
+        atm.EnterAcctNum(customer80.card.AcctNum());
+        assertEquals(false, atm.EnterPIN(999999999));
+    }
+
+    @Test
+    public void GetBalance() {
+        atm.EnterAcctNum(customer80.card.AcctNum());
+        atm.EnterPIN(customer80.PIN);
+        try {
+            assertEquals(BigDecimal.valueOf(80),atm.getBalance());
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    
 
     //withdrawl
         //no money
@@ -59,230 +189,5 @@ public class Tests {
     //account num doesnt exist
     //pin doesnt match acct
     //pin does match acct
-    //retiree balance
-
-
-
-    //
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    @Test
-    public void testOneThrow() {
-        //test a single throw and check scoring for the first frame and game
-        try {
-            scoreSheet.throwBall(ballThrow.EIGHT);
-        } catch (IllegalThrowException e) {
-            fail(e.getMessage());
-        }
-
-        try {
-            assertEquals(8, scoreSheet.getFrameScore(0));
-            assertEquals(8, scoreSheet.getTotalScore());
-        } catch (IllegalScoreException e) {
-            fail(e.getMessage());
-        }
-
-    }
-
-    @Test
-    public void testTwoThrows() {
-        //test two throws and check scoring for the first frame and game
-        try {
-            scoreSheet.throwBall(ballThrow.EIGHT);
-            scoreSheet.throwBall(ballThrow.ONE);
-        } catch (IllegalThrowException e) {
-            fail(e.getMessage());
-        }
-
-        try {
-            assertEquals(9, scoreSheet.getFrameScore(0));
-            assertEquals(9, scoreSheet.getTotalScore());
-        } catch (IllegalScoreException e) {
-            fail(e.getMessage());
-        }
-
-    }
-
-    @Test
-    public void testThreeThrows() {
-        //test three throws and check scoring for the first two frames and game
-        try {
-            scoreSheet.throwBall(ballThrow.EIGHT);
-            scoreSheet.throwBall(ballThrow.ONE);
-            scoreSheet.throwBall(ballThrow.NINE);
-        } catch (IllegalThrowException e) {
-            fail(e.getMessage());
-        }
-
-        try {
-            assertEquals(9, scoreSheet.getFrameScore(0));
-            assertEquals(9, scoreSheet.getFrameScore(1));
-            assertEquals(18, scoreSheet.getTotalScore());
-        } catch (IllegalScoreException e) {
-            fail(e.getMessage());
-        }
-    }
-
-    @Test
-    public void testSpareCountsNextFrameScore() {
-        //throw a spare in a frame and make sure its score is correct (counting the following frame, which should also be completed)
-        try {
-            scoreSheet.throwBall(ballThrow.EIGHT);
-            scoreSheet.throwBall(ballThrow.TWO);
-            scoreSheet.throwBall(ballThrow.NINE);
-            scoreSheet.throwBall(ballThrow.ZERO);
-        } catch (IllegalThrowException e) {
-            fail(e.getMessage());
-        }
-
-        try {
-            assertEquals(19, scoreSheet.getFrameScore(0));
-            assertEquals(9, scoreSheet.getFrameScore(1));
-            assertEquals(28, scoreSheet.getTotalScore());
-        } catch (IllegalScoreException e) {
-            fail(e.getMessage());
-        }
-    }
-
-    @Test
-    public void testStrikeMovesToNextFrame() {
-        //ensure that a strike frame may not have two throws
-        try {
-            scoreSheet.throwBall(ballThrow.STRIKE);
-            scoreSheet.throwBall(ballThrow.TWO);
-
-        } catch (IllegalThrowException e) {
-            fail(e.getMessage());
-        }
-
-        try {
-            assertEquals(12, scoreSheet.getFrameScore(0));
-            assertEquals(2, scoreSheet.getFrameScore(1));
-            assertEquals(14, scoreSheet.getTotalScore());
-        } catch (IllegalScoreException e) {
-            fail(e.getMessage());
-        }
-    }
-
-    //-----------------------------------------------------------------------------
-
-
-    @Test
-    public void testStrikeCountsNextFrameScores() //- throw a strike in a frame and make sure itsscore is correct (counting the following frames, which should also be completed)
-    {
-        try{
-            scoreSheet.throwBall(ballThrow.STRIKE);
-            scoreSheet.throwBall(ballThrow.STRIKE);
-            scoreSheet.throwBall(ballThrow.STRIKE);
-        }
-        catch(IllegalThrowException e){
-            fail(e.getMessage());
-        }
-
-        try {
-            assertEquals(30, scoreSheet.getFrameScore(0));
-            assertEquals(20, scoreSheet.getFrameScore(1));
-            assertEquals(10, scoreSheet.getFrameScore(2));
-            assertEquals(60, scoreSheet.getTotalScore());
-        } catch (IllegalScoreException e) {
-            fail(e.getMessage());
-        }
-    }
-
-    @Test
-    public void testSpareOnLastFrame() //- test throwing a spare on the 10th frame
-    {
-        for(int i = 0; i < 9; ++i) {
-            try {
-                scoreSheet.throwBall(ballThrow.STRIKE);
-            } catch(IllegalThrowException e) {
-                fail("Illegal throw exception");
-            }
-        }
-        for(int i = 0; i < 2; ++i) {
-            try {
-                scoreSheet.throwBall(ballThrow.FIVE);
-            } catch(IllegalThrowException e) {
-                fail("Illegal throw exception");
-            }
-        }
-        try{
-            assertEquals(10, scoreSheet.getFrameScore(9));
-            assertEquals(270, scoreSheet.getTotalScore());
-        }
-        catch(IllegalScoreException e){
-            fail("illegal score exception");
-        }
-
-
-    }
-    @Test
-    public void testStrikeOnLastFrames() //- test throwing a strike on the 8th, 9th, and 10th frames
-    {
-        for(int i = 0; i < 10; ++i) {
-            try {
-                scoreSheet.throwBall(ballThrow.STRIKE);
-            } catch(IllegalThrowException e) {
-                fail("Illegal throw exception");
-            }
-        }
-        try{
-            assertEquals(30, scoreSheet.getFrameScore(7));
-            assertEquals(20, scoreSheet.getFrameScore(8));
-            assertEquals(10, scoreSheet.getFrameScore(9));
-            assertEquals(270, scoreSheet.getTotalScore());
-        }
-        catch(IllegalScoreException e){
-            fail("illegal score exception");
-        }
-    }
-    @Test
-    public void testThrowOn11thFrame() //- ensure throwing on the 11th frame is not allowed (in some form)
-    {
-        for(int i = 0; i < 10; ++i) {
-            try {
-                scoreSheet.throwBall(ballThrow.STRIKE);
-            } catch(IllegalThrowException e) {
-                fail("Illegal throw exception on throw " + i);
-            }
-        }
-        try {
-            scoreSheet.throwBall(ballThrow.STRIKE);
-            fail("Fail: allowed an eleventh throw");
-        } catch(IllegalThrowException e) {
-            assertEquals(1,1);
-        }
-
-        try {
-            assertEquals(270, scoreSheet.getTotalScore());
-        } catch (IllegalScoreException e) {
-            fail(e.getMessage());
-        }
-    }
+    //retrieve balance
 }

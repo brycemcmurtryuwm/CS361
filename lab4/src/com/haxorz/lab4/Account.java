@@ -1,41 +1,40 @@
 package com.haxorz.lab4;
 
+import java.math.BigDecimal;
+
 public class Account {
 
-	//acctNum
-	//PIN Code
-	//balance
 	private long accountNumber;
 	private int pin;
-	private double balance;
+	private BigDecimal balance;
 
 
-	public Account(long accountNumber, int pin, double balance){
+	public Account(long accountNumber, int pin, BigDecimal balance){
 		this.accountNumber = accountNumber;
 		this.pin = pin;
 		this.balance = balance;
 	}
 	//validate (correct PIN?)
 	public boolean validate(long accountNumber, int pin){
-		if(this.accountNumber != accountNumber) return false;
-		if(this.pin != pin) return false;
-		return true;
+		return this.pin == pin && this.accountNumber == accountNumber;
 	}
-	public double getBalance(){
+	public BigDecimal getBalance(){
 		return balance;
 	}
 
-	public void deposit(double amount){
-		balance += amount;
+	public void deposit(BigDecimal amount){
+		if(amount.compareTo(BigDecimal.valueOf(0)) == -1) throw new IllegalArgumentException("The amount to deposit cannot be less than 0");
+
+		balance = balance.add(amount);
 	} //throw illegal
 
-	public double withdraw(double amount){
-		if(amount < 0) throw new IllegalArgumentException();
-		if(amount <= balance){
-			balance -= amount;
+	public BigDecimal withdraw(BigDecimal amount){
+		if(amount.compareTo(BigDecimal.valueOf(0)) == -1) throw new IllegalArgumentException("The amount to withdraw cannot be less than 0");
+		if(amount.compareTo(balance) <= 0){
+			balance = balance.subtract(amount);
 			return amount;
 		}
-		return 0;
+		throw new IllegalArgumentException("The amount to withdraw cannot be greater than your current balance");
 	}
 	
 	public long getAccountNumber() {

@@ -11,12 +11,25 @@ public class Bank {
         this.accts = accts;
     }
 
-	//validate(account)
-	public boolean validate(Account temp) {
-		return acctExists(temp);
+	public boolean validate(long acctNum, int pin) {
+		Account account = getAcct(acctNum, pin);
+
+		return account != null;
 	}
 
-	public boolean acctExists(Account temp){
-		return accts.containsKey(Long.toString(temp.getAccountNumber()));
+	public Account getAcct(long acctNum, int pin){
+	    if(!acctExists(acctNum))
+	        return null;
+
+	    Account account = accts.get(Long.toString(acctNum));
+
+	    if(!account.validate(acctNum, pin))
+	        return null;
+
+	    return account;
+    }
+
+	public boolean acctExists(long acctNum){
+		return accts.containsKey(Long.toString(acctNum));
     }
 }

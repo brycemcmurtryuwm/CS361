@@ -4,10 +4,14 @@ public class Card {
 
     //account Num
 
-    public double AcctNum;
+    private long acctNum;
 
-    public Card(double acctNum){
+    public long AcctNum(){
+        return acctNum;
+    }
 
+    public Card(long acctNum){
+        this.acctNum = acctNum;
     }
 
 
