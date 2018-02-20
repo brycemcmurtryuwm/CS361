@@ -87,6 +87,21 @@ public class driver {
 						break;
 				}
 			}
+			if(exit(sc, out))
+				return;
+		}
+	}
+
+	private static boolean exit(Scanner sc, PrintStream out) {
+		while(true){
+			out.println("Would you like to exit the atm (y/n):");
+			String tmp = sc.next().toLowerCase();
+			if("y".equals(tmp)){
+				return true;
+			}
+			else if("n".equals(tmp)){
+				return false;
+			}
 		}
 	}
 

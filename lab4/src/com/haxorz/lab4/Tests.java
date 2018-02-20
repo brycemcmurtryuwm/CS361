@@ -3,11 +3,12 @@ package com.haxorz.lab4;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.math.BigDecimal;
-import java.util.HashMap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 
 public class Tests {
@@ -172,22 +173,46 @@ public class Tests {
         }
     }
 
-    
+    @Test
+    public void DriverTestA() {
+        ByteArrayInputStream in = new ByteArrayInputStream("1234\n6789\nw\n20\nn\ny\n".getBytes());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-    //withdrawl
-        //no money
-        // invalid number
-        //money
-        //all money
-        //isufficiemt funds
+        driver.startDriver(in, new PrintStream(out));
 
-    //deposit
-        //no moneu
-        //some money
-        //invalid num
+        assertTrue(out.toString().contains("Withdrew $20.0 from account.\r\n" +
+                "Current Balance: $60.0"));
+    }
 
-    //account num doesnt exist
-    //pin doesnt match acct
-    //pin does match acct
-    //retrieve balance
+    @Test
+    public void DriverTestB() {
+        ByteArrayInputStream in = new ByteArrayInputStream("1234\n6789\nw\n80\nn\ny\n".getBytes());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        driver.startDriver(in, new PrintStream(out));
+
+        assertTrue(out.toString().contains("Withdrew $80.0 from account.\r\n" +
+                "Current Balance: $0.0"));
+    }
+
+    @Test
+    public void DriverTestC() {
+        ByteArrayInputStream in = new ByteArrayInputStream("6789\n9999\n4321\nb\nn\ny\n".getBytes());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        driver.startDriver(in, new PrintStream(out));
+
+        assertTrue(out.toString().contains("Wrong PIN."));
+    }
+
+    @Test
+    public void DriverTestD() {
+        ByteArrayInputStream in = new ByteArrayInputStream("6789\n4321\nd\n20\nn\ny\n".getBytes());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        driver.startDriver(in, new PrintStream(out));
+
+        assertTrue(out.toString().contains("Deposited $20.0 to account.\r\n" +
+                "Current Balance: $80.0"));
+    }
 }
