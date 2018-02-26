@@ -25,10 +25,10 @@ public class Tests {
 
     @Before
     public void setup(){
-        customer80 = new Customer(new CardReader.Card(1234), 6789);
-        customer0 = new Customer(new CardReader.Card(1235), 0000);
-        customer60 = new Customer(new CardReader.Card(6789), 4321);
-        noExistCust = new Customer(new CardReader.Card(12390), 0000);
+        customer80 = new Customer(new Card(1234), 6789);
+        customer0 = new Customer(new Card(1235), 0000);
+        customer60 = new Customer(new Card(6789), 4321);
+        noExistCust = new Customer(new Card(12390), 0000);
 
         atm = new ATM();
         atm.start();
@@ -37,7 +37,7 @@ public class Tests {
     //region Withdraw Tests
     @Test
     public void withdrawNoMoney() {
-        atm.EnterAcctNum(atm);
+        atm.EnterAcctNum(customer0.card.AcctNum());
         atm.EnterPIN(customer0.PIN);
         try {
             atm.withdraw(BigDecimal.ZERO);

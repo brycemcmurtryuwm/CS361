@@ -9,13 +9,6 @@ public class ATM {
     private long curAcctNum;
     private int curPIN;
     private Account curAcct;
-    private SimulatedHW hw;
-
-
-    public ATM(SimulatedHW hw){
-
-        this.hw = hw;
-    }
 
     //start method
     public void start(){
@@ -36,16 +29,6 @@ public class ATM {
         curAcctNum = 0;
         curPIN = 0;
         curAcct = null;
-    }
-
-    public void execute(String cmd){//
-        //Button w/cb(balance)/cancel/d
-        //num
-
-    }
-
-    public void executeOnHW(String cmd){
-        this.hw.execute(cmd);
     }
 
     public boolean EnterAcctNum(long acctNum){
