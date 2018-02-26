@@ -2,10 +2,10 @@ package com.haxorz.lab5;
 
 public class Customer {
 
-    public Card card;
+    public CardReader.Card card;
     public int PIN;
 
-    public Customer (Card card, int pin){
+    public Customer (CardReader.Card card, int pin){
         this.card = card;
         this.PIN = pin;
     }
