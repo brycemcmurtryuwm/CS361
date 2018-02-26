@@ -10,7 +10,7 @@ public class driver {
 	}
 	
 	public static void startDriver(InputStream in, PrintStream out){
-		ATM atm = new ATM();
+		ATM atm = new ATM(new SimulatedHW());
 		
 		outerloop:
 		while(true){
