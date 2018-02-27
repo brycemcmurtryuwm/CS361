@@ -30,14 +30,16 @@ public class Tests {
         customer60 = new Customer(new Card(6789), 4321);
         noExistCust = new Customer(new Card(12390), 0000);
 
-        atm = new ATM();
+        SimulatedHW hw = new SimulatedHW(System.out);
+        atm = new ATM(hw);
+        hw.connectATM(atm);
         atm.start();
     }
 
     //region Withdraw Tests
     @Test
     public void withdrawNoMoney() {
-        atm.EnterAcctNum(customer0.card.AcctNum());
+        atm.EnterAcctNum(Card.CardReader.acctNumber(customer0.card));
         atm.EnterPIN(customer0.PIN);
         try {
             atm.withdraw(BigDecimal.ZERO);
@@ -50,7 +52,7 @@ public class Tests {
 
     @Test
     public void withdrawNegativeNumber() {
-        atm.EnterAcctNum(customer0.card.AcctNum());
+        atm.EnterAcctNum(Card.CardReader.acctNumber(customer0.card));
         atm.EnterPIN(customer0.PIN);
         try {
             atm.withdraw(BigDecimal.valueOf(-10));
@@ -63,7 +65,7 @@ public class Tests {
 
     @Test
     public void withdrawMoney() {
-        atm.EnterAcctNum(customer80.card.AcctNum());
+        atm.EnterAcctNum(Card.CardReader.acctNumber(customer80.card));
         atm.EnterPIN(customer80.PIN);
         try {
             atm.withdraw(BigDecimal.valueOf(60));
@@ -76,7 +78,7 @@ public class Tests {
 
     @Test
     public void withdrawAllMoney() {
-        atm.EnterAcctNum(customer60.card.AcctNum());
+        atm.EnterAcctNum(Card.CardReader.acctNumber(customer60.card));
         atm.EnterPIN(customer60.PIN);
         try {
             atm.withdraw(BigDecimal.valueOf(60));
@@ -89,13 +91,15 @@ public class Tests {
 
     @Test
     public void withdrawInsufficientFunds() {
-        atm.EnterAcctNum(customer80.card.AcctNum());
+        atm.EnterAcctNum(Card.CardReader.acctNumber(customer80.card));
         atm.EnterPIN(customer80.PIN);
         try {
-            atm.withdraw(BigDecimal.valueOf(100));
-            fail("Insuffient Funds");
+            BigDecimal val = atm.withdraw(BigDecimal.valueOf(100));
+
+            assertEquals(BigDecimal.valueOf(80), val);
+            assertEquals(BigDecimal.ZERO, atm.getBalance());
         } catch (Exception e) {
-            assertEquals(1,1);
+            fail(e.getMessage());
         }
 
     }
@@ -104,7 +108,7 @@ public class Tests {
     //region deposit
     @Test
     public void depositNoMoney() {
-        atm.EnterAcctNum(customer80.card.AcctNum());
+        atm.EnterAcctNum(Card.CardReader.acctNumber(customer80.card));
         atm.EnterPIN(customer80.PIN);
         try {
             atm.deposit(BigDecimal.valueOf(0));
@@ -116,7 +120,7 @@ public class Tests {
 
     @Test
     public void depositMoney() {
-        atm.EnterAcctNum(customer60.card.AcctNum());
+        atm.EnterAcctNum(Card.CardReader.acctNumber(customer60.card));
         atm.EnterPIN(customer60.PIN);
         try {
             atm.deposit(BigDecimal.valueOf(40));
@@ -128,7 +132,7 @@ public class Tests {
 
     @Test
     public void depositInvalid() {
-        atm.EnterAcctNum(customer80.card.AcctNum());
+        atm.EnterAcctNum(Card.CardReader.acctNumber(customer80.card));
         atm.EnterPIN(customer80.PIN);
         try {
             atm.deposit(BigDecimal.valueOf(-10));
@@ -141,30 +145,30 @@ public class Tests {
 
     @Test
     public void AccountExists() {
-        assertEquals(true, atm.EnterAcctNum(customer80.card.AcctNum()));
+        assertEquals(true, atm.EnterAcctNum(Card.CardReader.acctNumber(customer80.card)));
     }
 
     @Test
     public void AccountDoesntExists() {
-        assertEquals(false, atm.EnterAcctNum(noExistCust.card.AcctNum()));
+        assertEquals(false, atm.EnterAcctNum(Card.CardReader.acctNumber(noExistCust.card)));
     }
 
 
     @Test
     public void ValidPIN() {
-        atm.EnterAcctNum(customer80.card.AcctNum());
+        atm.EnterAcctNum(Card.CardReader.acctNumber(customer80.card));
         assertEquals(true, atm.EnterPIN(customer80.PIN));
     }
 
     @Test
     public void InvalidPIN() {
-        atm.EnterAcctNum(customer80.card.AcctNum());
+        atm.EnterAcctNum(Card.CardReader.acctNumber(customer80.card));
         assertEquals(false, atm.EnterPIN(999999999));
     }
 
     @Test
     public void GetBalance() {
-        atm.EnterAcctNum(customer80.card.AcctNum());
+        atm.EnterAcctNum(Card.CardReader.acctNumber(customer80.card));
         atm.EnterPIN(customer80.PIN);
         try {
             assertEquals(BigDecimal.valueOf(80),atm.getBalance());

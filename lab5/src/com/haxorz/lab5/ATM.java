@@ -1,26 +1,29 @@
 package com.haxorz.lab5;
 
-import java.io.PrintStream;
 import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Scanner;
 import java.time.format.*;
 
-public class ATM {
+public class ATM implements CardNumberListener {
 
     private Bank bank;
     private long curAcctNum;
     private int curPIN;
     private Account curAcct;
-    private Printer printer;
-    private CashDispenser cashDispenser;
 
     //0-waiting for a card, 1-waiting for a pin, 2-select transaction, 3-select amount of money to deposit
     private int state = 0;
 
+    private SimulatedHW hw;
 
+
+    public ATM(SimulatedHW hw){
+
+        this.hw = hw;
+    }
+    
     //start method
     public void start(){
 
@@ -46,6 +49,8 @@ public class ATM {
         if (bank.acctExists(acctNum))
         {
             curAcctNum = acctNum;
+            curPIN = 0;
+            curAcct = null;
             return true;
         }
 
@@ -87,20 +92,15 @@ public class ATM {
 
         return curAcct.getBalance();
     }
-    /**
-     * Reads in commands with date stamps which get read as commands
-     *
-     * @param   sc scanner either from a file or user input
-     * @param   out A printstream to a doc and/or the screen
-     * @return  boolean of whether the ATM should continue operation
-     */
 
-    public boolean readCommand(Scanner sc, PrintStream out){
-        String tmp = sc.nextLine();
-        String[] tmpArr = tmp.split(" ");
-        if(tmpArr.length != 3) return false;
 
-        LocalTime t;
+
+    public void execute(String cmd){//
+        String[] tmpArr = cmd.split("\\s+");
+        if(tmpArr.length < 2) return;
+
+        LocalTime t = LocalTime.now();
+        boolean firstArgTime = true;
 
         //this tells us if it is a legal time
         //according to ISO local time, which
@@ -108,27 +108,14 @@ public class ATM {
         try{
             t = LocalTime.parse(tmpArr[0]);
         } catch(DateTimeParseException e){
-            return false;
+            firstArgTime = false;
         }
 
         //this reduces the size of the array since we don't have to deal with the time anymore
-        tmpArr = Arrays.copyOfRange(tmpArr, 1,2);
+        tmpArr = firstArgTime ? Arrays.copyOfRange(tmpArr, 1,tmpArr.length) : tmpArr;
 
         //this switch takes all the commands possible for the ATM to read
         switch (tmpArr[0]){
-            case "CARDREAD":
-                if(state != 0) break;
-                try{
-                    long input = Long.parseLong(tmpArr[1]);
-                    curAcctNum = input;
-                    state = bank.acctExists(curAcctNum)?1:0;
-                }
-                catch(NumberFormatException e){
-                    out.println("Invalid card number");
-                    break;
-                }
-                break;
-
             case "NUM":
                 switch(state) {
                     case(1):
@@ -137,7 +124,7 @@ public class ATM {
                             if(!bank.validate(curAcctNum, curPIN)) break;
                             curAcct = bank.getAcct(curAcctNum, curPIN);
                             state = 2;
-
+                            break;
                         } catch(NumberFormatException e) {break;}
                     case(3):
                         try {
@@ -146,11 +133,14 @@ public class ATM {
 
                             //amount is now the real amount taken from the account
                             amount = curAcct.withdraw(amount);
-                            cashDispenser.dispense(amount);
-                            String receipt = "PRINT" + t.format(DateTimeFormatter.ISO_LOCAL_TIME) + "W $" + amount;
-                            readCommand(new Scanner(receipt), out );
+                            executeOnHW("DISPENSE " + amount);
+                            String receipt = "PRINT " + t.format(DateTimeFormatter.ISO_LOCAL_TIME) + " W $" + getBalance();
+                            executeOnHW(receipt);
+                            state = 2;
                             break;
-                        } catch(IllegalArgumentException e) {break;}
+                        } catch(Exception e) {
+                            break;
+                        }
 
                     default: break;
                 }
@@ -161,45 +151,61 @@ public class ATM {
                         curAcct = null;
                         curAcctNum = 0;
                         curPIN = 0;
-                        if(state!=0) out.println("EJECT CARD");
+                        if(state!=0)
+                            executeOnHW("DIS EJECT CARD");
                         state = 0;
                         break;
                     case "W":
-                        if(state == 2) state = 3;
+                        if(state == 2)
+                            state = 3;
                         break;
                     case "CB":
                         if(state == 2){
-                            String balanceReceipt = "PRINT" + t.format(DateTimeFormatter.ISO_LOCAL_TIME) + "W $" + curAcct.getBalance();
-                            System.out.println("Current balance : $" + curAcct.getBalance());
+                            String balanceReceipt = t.format(DateTimeFormatter.ISO_LOCAL_TIME) + " Current Balance: $" + curAcct.getBalance();
+                            executeOnHW("PRINT " + balanceReceipt);
                         }
                         break;
                     default: break;
                 }
                 break;
+            case "CARDREAD":
             case "DIS":
-                out.println(tmpArr[1]);
-                break;
             case "PRINT":
-                printer.print(tmpArr[1]);
-                break;
+            case "DISPENSE":
+                executeOnHW(cmd);
+                return;
             default: break;
 
         }
 
-        //This displays the output to prompt for the next command
         switch(state){
             case 0:
                 break;
             case 1:
-                out.println("Enter PIN");
+                executeOnHW("DIS Enter PIN");
                 break;
             case 2:
-                out.println("Choose Transaction");
+                executeOnHW("DIS Choose Transaction");
                 break;
             case 3:
-                out.println("Amount?");
+                executeOnHW("DIS Amount?");
                 break;
         }
-        return false;
+
+    }
+
+    public void executeOnHW(String cmd){
+        this.hw.execute(cmd);
+    }
+
+    @Override
+    public void acctNumberAvailable(long acctNum) {
+        this.EnterAcctNum(acctNum);
+        if (bank.acctExists(curAcctNum))
+        {
+            state = 1;
+            executeOnHW("DIS Enter PIN");
+        }
+        else state = 0;
     }
 }
