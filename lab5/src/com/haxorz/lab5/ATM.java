@@ -96,7 +96,7 @@ public class ATM implements CardNumberListener {
 
 
     public void execute(String cmd){//
-        String[] tmpArr = cmd.split(" ");
+        String[] tmpArr = cmd.split("\\s+");
         if(tmpArr.length < 2) return;
 
         LocalTime t = LocalTime.now();
@@ -112,7 +112,7 @@ public class ATM implements CardNumberListener {
         }
 
         //this reduces the size of the array since we don't have to deal with the time anymore
-        tmpArr = firstArgTime ? Arrays.copyOfRange(tmpArr, 1,2) : tmpArr;
+        tmpArr = firstArgTime ? Arrays.copyOfRange(tmpArr, 1,tmpArr.length) : tmpArr;
 
         //this switch takes all the commands possible for the ATM to read
         switch (tmpArr[0]){
@@ -124,7 +124,7 @@ public class ATM implements CardNumberListener {
                             if(!bank.validate(curAcctNum, curPIN)) break;
                             curAcct = bank.getAcct(curAcctNum, curPIN);
                             state = 2;
-
+                            break;
                         } catch(NumberFormatException e) {break;}
                     case(3):
                         try {
@@ -134,10 +134,13 @@ public class ATM implements CardNumberListener {
                             //amount is now the real amount taken from the account
                             amount = curAcct.withdraw(amount);
                             executeOnHW("DISPENSE " + amount);
-                            String receipt = "PRINT " + t.format(DateTimeFormatter.ISO_LOCAL_TIME) + " W $" + amount;
+                            String receipt = "PRINT " + t.format(DateTimeFormatter.ISO_LOCAL_TIME) + " W $" + getBalance();
                             executeOnHW(receipt);
+                            state = 2;
                             break;
-                        } catch(IllegalArgumentException e) {break;}
+                        } catch(Exception e) {
+                            break;
+                        }
 
                     default: break;
                 }
@@ -149,22 +152,28 @@ public class ATM implements CardNumberListener {
                         curAcctNum = 0;
                         curPIN = 0;
                         if(state!=0)
-                            executeOnHW("DIS \"EJECT CARD\"");
+                            executeOnHW("DIS EJECT CARD");
                         state = 0;
                         break;
                     case "W":
-                        if(state == 2) state = 3;
+                        if(state == 2)
+                            state = 3;
                         break;
                     case "CB":
                         if(state == 2){
                             String balanceReceipt = t.format(DateTimeFormatter.ISO_LOCAL_TIME) + " Current Balance: $" + curAcct.getBalance();
                             executeOnHW("PRINT " + balanceReceipt);
-                            executeOnHW("DIS " + balanceReceipt);
                         }
                         break;
                     default: break;
                 }
                 break;
+            case "CARDREAD":
+            case "DIS":
+            case "PRINT":
+            case "DISPENSE":
+                executeOnHW(cmd);
+                return;
             default: break;
 
         }
@@ -173,13 +182,13 @@ public class ATM implements CardNumberListener {
             case 0:
                 break;
             case 1:
-                executeOnHW("DIS \"Enter PIN\"");
+                executeOnHW("DIS Enter PIN");
                 break;
             case 2:
-                executeOnHW("DIS \"Choose Transaction\"");
+                executeOnHW("DIS Choose Transaction");
                 break;
             case 3:
-                executeOnHW("DIS \"Amount?\"");
+                executeOnHW("DIS Amount?");
                 break;
         }
 
@@ -195,7 +204,7 @@ public class ATM implements CardNumberListener {
         if (bank.acctExists(curAcctNum))
         {
             state = 1;
-            executeOnHW("DIS \"Enter PIN\"");
+            executeOnHW("DIS Enter PIN");
         }
         else state = 0;
     }

@@ -1,4 +1,6 @@
 package com.haxorz.lab5;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.math.BigDecimal;
@@ -6,11 +8,76 @@ import java.util.Scanner;
 
 public class driver {
 	public static void main(String[] args){
-		startDriver(System.in, System.out);
+		System.out.println("Welcome to the ATM.");
+
+		while (true){
+			System.out.println("To read from a file press '1' to use the console press '2'");
+
+			Scanner sc = new Scanner(System.in);
+			String tmp = sc.next();
+			try{
+				int choice = Integer.parseInt(tmp);
+				if(choice == 1){
+					ReadFromFile(System.out);
+				}
+				else if(choice == 2){
+					ReadConsoleInput(System.in, System.out);
+				}
+				else {
+					continue;
+				}
+				break;
+			}catch(Exception e){
+				continue;
+			}
+		}
+
+	}
+
+	public static void ReadFromFile(PrintStream out){
+		try{
+			BufferedReader bufferedReader = new BufferedReader(new FileReader("transactions.txt"));
+
+			String line;
+			SimulatedHW hw = new SimulatedHW(out);
+			ATM atm = new ATM(hw);
+			hw.connectATM(atm);
+			atm.start();
+
+			while((line = bufferedReader.readLine()) != null) {
+				atm.execute(line);
+			}
+
+			bufferedReader.close();
+		}
+		catch (Exception e){
+
+		}
+	}
+
+	public static void ReadConsoleInput(InputStream in, PrintStream out){
+		SimulatedHW hw = new SimulatedHW(out);
+		ATM atm = new ATM(hw);
+		hw.connectATM(atm);
+		atm.start();
+
+		Scanner sc = new Scanner(in);
+
+		while(true){
+			String line = sc.nextLine();
+
+			if("exit".equals(line)){
+				return;
+			}
+
+			atm.execute(line);
+		}
 	}
 	
 	public static void startDriver(InputStream in, PrintStream out){
-		ATM atm = new ATM(new SimulatedHW());
+		SimulatedHW hw = new SimulatedHW(out);
+		ATM atm = new ATM(hw);
+		hw.connectATM(atm);
 		
 		outerloop:
 		while(true){

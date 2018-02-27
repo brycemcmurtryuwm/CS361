@@ -6,7 +6,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 
 public class SimulatedHW {
-    private CardReader reader = new CardReader();
+    private Card.CardReader reader = new Card.CardReader();
     private CashDispenser dispenser = new CashDispenser();
     private Printer printer = new Printer();
     private PrintStream display;
@@ -23,7 +23,7 @@ public class SimulatedHW {
     }
 
     public void execute(String cmd){
-        String[] tmpArr = cmd.split(" ");
+        String[] tmpArr = cmd.split("\\s+");
         if(tmpArr.length < 2) return;
 
         boolean firstArgTime = true;
@@ -38,7 +38,7 @@ public class SimulatedHW {
         }
 
         //this reduces the size of the array since we don't have to deal with the time anymore
-        tmpArr = firstArgTime ? Arrays.copyOfRange(tmpArr, 1,2) : tmpArr;
+        tmpArr = firstArgTime ? Arrays.copyOfRange(tmpArr, 1,tmpArr.length) : tmpArr;
 
         //this switch takes all the commands possible for the hw to read
         switch (tmpArr[0]){
@@ -55,10 +55,11 @@ public class SimulatedHW {
                 break;
 
             case "DIS":
-                display.println(tmpArr[1]);
+                display.println(cmd.substring(4));
             break;
             case "PRINT":
-                printer.print(tmpArr[1]);
+                printer.print(cmd.substring(6));
+                display.println(cmd.substring(6));
             break;
             case "DISPENSE":
                 try {
