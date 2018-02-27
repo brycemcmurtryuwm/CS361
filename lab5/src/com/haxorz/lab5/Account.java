@@ -28,13 +28,20 @@ public class Account {
 		balance = balance.add(amount);
 	} //throw illegal
 
+	/**
+	 * @param amount	requested amount to be withdrawn
+	 * @return 			actual amount taken out
+	 */
 	public BigDecimal withdraw(BigDecimal amount){
-		if(amount.compareTo(BigDecimal.valueOf(0)) == -1) throw new IllegalArgumentException("The amount to withdraw cannot be less than 0");
-		if(amount.compareTo(balance) <= 0){
-			balance = balance.subtract(amount);
-			return amount;
+		if(amount.compareTo(BigDecimal.ZERO) == -1) throw new IllegalArgumentException("The amount to withdraw cannot be less than 0");
+		if(amount.compareTo(balance) <= 0) {balance = balance.subtract(amount);}
+
+		//if we dont have enough money we withdraw the whole account, as shown in expected output
+		else{
+			amount = balance;
+			balance = BigDecimal.ZERO;
 		}
-		throw new IllegalArgumentException("The amount to withdraw cannot be greater than your current balance");
+		return amount;
 	}
 	
 	public long getAccountNumber() {
