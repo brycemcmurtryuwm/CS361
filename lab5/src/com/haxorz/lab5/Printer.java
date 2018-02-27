@@ -12,7 +12,7 @@ public class Printer {
 //    	}
 //    	return sdf.format(timestamp) + " " + toPrint;
 
-    public String print(String toPrint){
+    public void print(String toPrint){
         //abstraction for a printer
         //as we do not have a printer
     }
