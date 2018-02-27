@@ -31,7 +31,7 @@ public class Tests {
         noExistCust = new Customer(new Card(12390), 0000);
 
         SimulatedHW hw = new SimulatedHW(System.out);
-        ATM atm = new ATM(hw);
+        atm = new ATM(hw);
         hw.connectATM(atm);
         atm.start();
     }
@@ -94,10 +94,12 @@ public class Tests {
         atm.EnterAcctNum(Card.CardReader.acctNumber(customer80.card));
         atm.EnterPIN(customer80.PIN);
         try {
-            atm.withdraw(BigDecimal.valueOf(100));
-            fail("Insuffient Funds");
+            BigDecimal val = atm.withdraw(BigDecimal.valueOf(100));
+
+            assertEquals(BigDecimal.valueOf(80), val);
+            assertEquals(BigDecimal.ZERO, atm.getBalance());
         } catch (Exception e) {
-            assertEquals(1,1);
+            fail(e.getMessage());
         }
 
     }
