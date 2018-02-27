@@ -1,6 +1,4 @@
 package com.haxorz.lab5;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 
 public class Printer {
 
@@ -13,8 +11,9 @@ public class Printer {
 //    		return toPrint;
 //    	}
 //    	return sdf.format(timestamp) + " " + toPrint;
+
     public String print(String toPrint){
-
+        //abstraction for a printer
+        //as we do not have a printer
     }
-
 }
