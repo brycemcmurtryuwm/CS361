@@ -2,11 +2,11 @@ package com.haxorz.ChronoTimer.Hardware;
 
 public class InputSensor {
 
-    public String Name;
+    public SensorType SensorType;
 
-    public InputSensor(String name){
+    public InputSensor(SensorType type){
 
-        this.Name = name;
+        this.SensorType = type;
     }
 
     public HardwareEventListener Listener = null;
@@ -21,4 +21,7 @@ public class InputSensor {
     }
 
 
+    public void disconnect() {
+        Listener = null;
+    }
 }

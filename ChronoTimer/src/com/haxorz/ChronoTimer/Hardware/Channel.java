@@ -14,7 +14,7 @@ public class Channel implements HardwareEventListener {
     public void Trigger(){
         if(enabled)
         {
-
+            
         }
     }
 
