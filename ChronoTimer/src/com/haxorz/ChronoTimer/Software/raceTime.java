@@ -8,6 +8,15 @@ public class raceTime {
 	private LocalTime _endTime;
 	private boolean _DNF;
 
+	//the name of the athlete will need to be changed if we
+	//introduce an athlete class
+	private String _athlete;
+
+
+	public raceTime(String athlete) {
+		_athlete = athlete;
+	}
+
 	public LocalTime getStartTime() { return _startTime; }
 	public LocalTime getEndTime() {
 		return _endTime;
@@ -19,9 +28,9 @@ public class raceTime {
 		throw new IllegalStateException("Start and/or End time not set");
 	}
 	public boolean isDNF() { return _DNF; }
+	public String getAthlete() { return _athlete; }
 
-
-
+	public void setAthlete(String athlete) { _athlete = athlete; }
 	public void setDNF(boolean DNF) { this._DNF = DNF; }
 	public void setStartTime(LocalTime startTime) { _startTime = startTime; }
 	public void setEndTime(LocalTime endTime) {
@@ -35,18 +44,58 @@ public class raceTime {
 	}
 
 	/**
-	 * @return a string with the race time with hours place
+	 * @return a string with the race time with hours, minutes, seconds and hundredths of a second
 	 */
-//	public String toStringHours(){
-//		if(_DNF){
-//			return "DNF";
-//		}
-//		else{
-//			String str = "";
-//			Duration d = this.getDuration();
-//			str +=  d.getSeconds() / 3600;
-//
-//			return str;
-//		}
-//	}
+	public String toStringHours(){
+		String str = _athlete + " :\t";
+		if(_DNF){ return str + "DNF"; }
+
+		Duration d = this.getDuration();
+
+		long hours = d.getSeconds() / 3600;
+		str += hours;
+		str += ':';
+
+		long mins = (d.getSeconds() / 60) % 60;
+		if(mins < 10) str += '0';
+		str += mins;
+		str += ':';
+
+		long secs = d.getSeconds() % 60;
+		if(secs < 10) str += '0';
+		str += secs;
+		str += '.';
+
+		int hund = d.getNano() / 10000000; //10^7
+		if(hund < 10) str += '0';
+		str += hund;
+
+		return str;
+	}
+
+	/**
+	 * @return string with minutes, seconds and hundredths of a secons
+	 */
+	public String toStringMinutes(){
+		String str = _athlete + " :\t";
+		if(_DNF){ return str + "DNF"; }
+
+		Duration d = this.getDuration();
+
+		long mins = (d.getSeconds() / 60);
+		if(mins < 10) str += '0';
+		str += mins;
+		str += ':';
+
+		long secs = d.getSeconds() % 60;
+		if(secs < 10) str += '0';
+		str += secs;
+		str += '.';
+
+		int hund = d.getNano() / 10000000; //10^7
+		if(hund < 10) str += '0';
+		str += hund;
+
+		return str;
+	}
 }
