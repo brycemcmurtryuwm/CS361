@@ -11,4 +11,8 @@ public class ClearCmd extends CTCommand {
         Num = num;
     }
 
+    @Override
+    public String ToString() {
+        return this.TimeStamp + " " + this.CMDType + " " + Num;
+    }
 }

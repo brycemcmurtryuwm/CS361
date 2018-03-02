@@ -8,4 +8,9 @@ public class GenericCmd extends CTCommand {
         super(type, timeStamp);
     }
 
+    @Override
+    public String ToString() {
+        return this.TimeStamp + " " + this.CMDType;
+    }
+
 }

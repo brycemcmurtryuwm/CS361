@@ -3,8 +3,11 @@ package com.haxorz.ChronoTimer;
 import com.haxorz.ChronoTimer.Commands.*;
 import com.haxorz.ChronoTimer.Hardware.Channel;
 import com.haxorz.ChronoTimer.Hardware.InputSensor;
+import com.haxorz.ChronoTimer.Hardware.Printer;
 import com.haxorz.ChronoTimer.Races.IndividualRace;
 import com.haxorz.ChronoTimer.Races.Race;
+
+import java.io.PrintStream;
 
 public class ChronoTimer {
 
@@ -15,11 +18,14 @@ public class ChronoTimer {
     private Channel[] channels = new Channel[12];
     private InputSensor[] sensors = new InputSensor[12];
 
-    public ChronoTimer() {
+    private Printer printer;
+
+    public ChronoTimer(PrintStream out) {
         for (int i = 0; i < 12; i++) {
             channels[i] = new Channel(i+1);
         }
 
+        printer = new Printer(out);
         Channel.ChannelListener = currentRace;
     }
 
@@ -36,6 +42,7 @@ public class ChronoTimer {
     }
 
     public void executeCmd(CTCommand cmd){
+        printer.log(cmd);
 
         if(cmd.CMDType == CmdType.POWER){
             poweredOn = !poweredOn;
@@ -71,7 +78,7 @@ public class ChronoTimer {
                 Channel.ChannelListener = currentRace;
                 return;
             case EXIT:
-                //TODO EXIT!!!!!!!!!!!!
+                Simulator.EXIT = true;
                 return;
             case RESET:
                 Reset();

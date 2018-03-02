@@ -1,14 +1,18 @@
 package com.haxorz.ChronoTimer.Commands;
 
-import java.sql.Timestamp;
 import java.time.LocalTime;
 
 public class TimeCmd extends CTCommand {
 
-    public Timestamp TimeToSet;
+    public LocalTime TimeToSet;
 
-    public TimeCmd(LocalTime timeStamp, Timestamp timeToSet) {
+    public TimeCmd(LocalTime timeStamp, LocalTime timeToSet) {
         super(CmdType.TIME, timeStamp);
         this.TimeToSet = timeToSet;
+    }
+
+    @Override
+    public String ToString() {
+        return this.TimeStamp + " " + this.CMDType + " " + TimeToSet;
     }
 }

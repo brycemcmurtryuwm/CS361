@@ -11,4 +11,9 @@ public class CancelCmd extends CTCommand {
         AthleteNum = athleteNum;
     }
 
+    @Override
+    public String ToString() {
+        return this.TimeStamp + " " + this.CMDType + " " + AthleteNum;
+    }
+
 }

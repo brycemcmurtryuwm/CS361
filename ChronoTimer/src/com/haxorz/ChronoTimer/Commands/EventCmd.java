@@ -11,4 +11,9 @@ public class EventCmd extends CTCommand {
         super(CmdType.EVENT, timeStamp);
         RaceType = raceType;
     }
+
+    @Override
+    public String ToString() {
+        return this.TimeStamp + " " + this.CMDType + " " + RaceType;
+    }
 }

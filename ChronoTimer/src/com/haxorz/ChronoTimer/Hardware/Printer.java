@@ -1,5 +1,8 @@
 package com.haxorz.ChronoTimer.Hardware;
 
+import com.haxorz.ChronoTimer.Commands.CTCommand;
+
+import java.io.PrintStream;
 import java.time.LocalTime;
 
 public class Printer {
@@ -7,6 +10,12 @@ public class Printer {
     private boolean _printerOn = false;
 
     public HardwareEventListener Listener = null;
+    private PrintStream out;
+
+    public Printer(PrintStream out) {
+
+        this.out = out;
+    }
 
     public void connectPrinter(HardwareEventListener listener){
         Listener = listener;
@@ -20,11 +29,14 @@ public class Printer {
     }
 
     public void print(String toPrint){
+        if(!_printerOn) return;
+
         //abstraction for a printer
         //as we do not have a printer
     }
 
 
-
-
+    public void log(CTCommand cmd) {
+        out.println(cmd.ToString());
+    }
 }

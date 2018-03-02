@@ -11,4 +11,9 @@ public class TriggerCmd extends CTCommand {
         Channel = channel;
     }
 
+    @Override
+    public String ToString() {
+        return this.TimeStamp + " " + this.CMDType + " " + Channel;
+    }
+
 }

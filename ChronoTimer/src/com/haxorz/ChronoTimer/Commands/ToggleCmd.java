@@ -10,4 +10,9 @@ public class ToggleCmd extends CTCommand {
         super(CmdType.TOG, timeStamp);
         this.Channel = channel;
     }
+
+    @Override
+    public String ToString() {
+        return this.TimeStamp + " " + this.CMDType + " " + Channel;
+    }
 }

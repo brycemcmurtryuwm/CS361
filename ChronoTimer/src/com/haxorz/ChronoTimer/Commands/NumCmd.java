@@ -11,4 +11,9 @@ public class NumCmd extends CTCommand {
         Number = number;
     }
 
+
+    @Override
+    public String ToString() {
+        return this.TimeStamp + " " + this.CMDType + " " + Number;
+    }
 }

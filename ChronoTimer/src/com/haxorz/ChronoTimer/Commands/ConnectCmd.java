@@ -15,4 +15,10 @@ public class ConnectCmd extends CTCommand {
         Sensor = type;
         this.channel = channel;
     }
+
+
+    @Override
+    public String ToString() {
+        return this.TimeStamp + " " + this.CMDType + " " + Sensor + " " + channel;
+    }
 }
