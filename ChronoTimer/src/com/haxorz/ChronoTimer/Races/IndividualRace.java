@@ -36,6 +36,7 @@ public class IndividualRace extends Race {
 
                 if(athlete != null){
                     athlete.getTimeTracker(this.RunNumber).setDNF(true);
+                    RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " DNF");
                     _finished.add(athlete);
                 }
                 break;
@@ -47,6 +48,7 @@ public class IndividualRace extends Race {
                     athlete.getTimeTracker(this.RunNumber).setDNF(true);
                 }
                 _finished.clear();
+                RunRepository.EndCurrentRun(this.RunNumber);
 
                 if(cmd.CMDType == CmdType.ENDRUN)
                     break;
@@ -69,6 +71,7 @@ public class IndividualRace extends Race {
                 break;
             case CANCEL:
                 CancelCmd cancelCmd = (CancelCmd) cmd;
+                RunRepository.addToCurrentRun("Athlete " + cancelCmd.AthleteNum + " CANCEL");
 
                 if(!Race.COMPETITORS.containsKey(cancelCmd.AthleteNum))
                     return;
@@ -101,14 +104,21 @@ public class IndividualRace extends Race {
 
             if(athlete != null){
                 athlete.getTimeTracker(this.RunNumber).setStartTime(timeStamp);
+                RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 1");
             }
+            else
+                RunRepository.addToCurrentRun("Athlete ??? TRIG Channel 1");
         }
         else if(channelNum == 2){
             Athlete athlete = _didNotStartYet.poll();
 
             if(athlete != null){
                 athlete.getTimeTracker(this.RunNumber).setEndTime(timeStamp);
+                RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 2");
+                RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " ELAPSED " + athlete.getTimeTracker(this.RunNumber).getDuration());
             }
+            else
+                RunRepository.addToCurrentRun("Athlete ??? TRIG Channel 2");
 
         }
     }

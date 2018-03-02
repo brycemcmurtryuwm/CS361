@@ -6,6 +6,7 @@ import com.haxorz.ChronoTimer.Hardware.InputSensor;
 import com.haxorz.ChronoTimer.Hardware.Printer;
 import com.haxorz.ChronoTimer.Races.IndividualRace;
 import com.haxorz.ChronoTimer.Races.Race;
+import com.haxorz.ChronoTimer.Races.RunRepository;
 
 import java.io.PrintStream;
 
@@ -87,7 +88,11 @@ public class ChronoTimer {
                 //TODO IN THE FUTURE NOT NEEDED IN SPRINT 1
                 break;
             case PRINT:
-                //TODO PRINT (LOG ACTIVITY AND ECHO TO A PRINTSTREAM)!!!!!!!!!!!!
+                PrintCmd printCmd = (PrintCmd)cmd;
+
+                if(!RunRepository.CompletedRuns.containsKey(printCmd.RaceNumber))
+                    return;
+                printer.print(RunRepository.CompletedRuns.get(printCmd.RaceNumber));
                 break;
             case TIME:
                 TimeCmd time = (TimeCmd)cmd;

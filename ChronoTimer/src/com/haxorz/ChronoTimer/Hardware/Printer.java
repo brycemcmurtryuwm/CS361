@@ -7,7 +7,7 @@ import java.time.LocalTime;
 
 public class Printer {
 
-    private boolean _printerOn = false;
+    private boolean _printerOn = true;
 
     public HardwareEventListener Listener = null;
     private PrintStream out;
@@ -31,8 +31,7 @@ public class Printer {
     public void print(String toPrint){
         if(!_printerOn) return;
 
-        //abstraction for a printer
-        //as we do not have a printer
+        out.print(toPrint);
     }
 
 
