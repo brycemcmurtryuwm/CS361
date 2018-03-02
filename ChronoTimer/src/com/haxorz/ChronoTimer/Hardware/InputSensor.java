@@ -1,5 +1,7 @@
 package com.haxorz.ChronoTimer.Hardware;
 
+import java.time.LocalTime;
+
 public class InputSensor {
 
     public SensorType SensorType;
@@ -15,9 +17,9 @@ public class InputSensor {
         Listener = listener;
     }
 
-    public void Triggered(){
+    public void Triggered(LocalTime timeStamp){
         if(Listener != null)
-            Listener.hwEventTriggered(HWEventType.InputSensorTriggered);
+            Listener.hwEventTriggered(HWEventType.InputSensorTriggered, timeStamp);
     }
 
 

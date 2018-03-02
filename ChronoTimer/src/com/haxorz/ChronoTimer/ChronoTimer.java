@@ -10,10 +10,18 @@ public class ChronoTimer {
 
     private boolean poweredOn = false;
 
-    private Race currentRace = null;
+    private Race currentRace = new IndividualRace();
 
     private Channel[] channels = new Channel[12];
     private InputSensor[] sensors = new InputSensor[12];
+
+    public ChronoTimer() {
+        for (int i = 0; i < 12; i++) {
+            channels[i] = new Channel(i+1);
+        }
+
+        Channel.ChannelListener = currentRace;
+    }
 
     public void executeCmd(CTCommand cmd){
 
@@ -46,6 +54,8 @@ public class ChronoTimer {
                         //TODO IN THE FUTURE
                         break;
                 }
+
+                Channel.ChannelListener = currentRace;
                 return;
             case EXIT:
                 //TODO EXIT
@@ -71,12 +81,47 @@ public class ChronoTimer {
                 sensors[disc.Channel-1].disconnect();
                 sensors[disc.Channel-1] = null;
                 break;
+
+            case TOG:
+                ToggleCmd tog = (ToggleCmd) cmd;
+                channels[tog.Channel-1].ToggleChannel();
+                break;
+            case TRIG:
+                TriggerCmd trig = (TriggerCmd) cmd;
+
+                InputSensor sensor = sensors[trig.Channel -1];
+
+                if(sensor != null)
+                    sensor.Triggered(cmd.TimeStamp);
+                else
+                    channels[trig.Channel - 1].Trigger(cmd.TimeStamp);
+                break;
+            case START:
+                sensor = sensors[0];
+
+                if(sensor != null)
+                    sensor.Triggered(cmd.TimeStamp);
+                else
+                    channels[0].Trigger(cmd.TimeStamp);
+                break;
+            case FINISH:
+                sensor = sensors[1];
+
+                if(sensor != null)
+                    sensor.Triggered(cmd.TimeStamp);
+                else
+                    channels[1].Trigger(cmd.TimeStamp);
+                break;
+            case DNF:
+            case NEWRUN:
+            case ENDRUN:
+            case NUM:
+            case CLR:
             default:
                 if(currentRace != null){
                     currentRace.executeCmd(cmd);
                 }
         }
-
 
 
 
