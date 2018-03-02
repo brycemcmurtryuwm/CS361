@@ -1,6 +1,6 @@
 package com.haxorz.ChronoTimer;
 
-public class Simulator {
+public class Simulator {//driver
 
 
 }

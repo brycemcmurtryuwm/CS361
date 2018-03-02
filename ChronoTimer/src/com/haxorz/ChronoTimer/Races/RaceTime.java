@@ -1,41 +1,36 @@
-package com.haxorz.ChronoTimer.Software;
+package com.haxorz.ChronoTimer.Races;
 
-import java.time.*;
+import java.time.Duration;
+import java.time.LocalTime;
 
-public class raceTime {
+public class RaceTime {
 
 	private LocalTime _startTime;
 	private LocalTime _endTime;
-	private boolean _DNF;
+	private boolean _DNF = false;
 
-	//the name of the athlete will need to be changed if we
-	//introduce an athlete class
-	private String _athlete;
+	private Athlete _athlete;
 
 
-	public raceTime(String athlete) {
+	public RaceTime(Athlete athlete) {
 		_athlete = athlete;
 	}
 
 	public LocalTime getStartTime() { return _startTime; }
-	public LocalTime getEndTime() {
-		return _endTime;
-	}
+	public void setStartTime(LocalTime startTime) { _startTime = startTime; }
+
+	public LocalTime getEndTime() { return _endTime;}
+	public void setEndTime(LocalTime endTime) {	_endTime = endTime;	}
+
 	public Duration getDuration(){
 		if(_startTime != null && _endTime != null){
 			return Duration.between(_startTime, _endTime);
 		}
 		throw new IllegalStateException("Start and/or End time not set");
 	}
-	public boolean isDNF() { return _DNF; }
-	public String getAthlete() { return _athlete; }
 
-	public void setAthlete(String athlete) { _athlete = athlete; }
+	public boolean isDNF() { return _DNF; }
 	public void setDNF(boolean DNF) { this._DNF = DNF; }
-	public void setStartTime(LocalTime startTime) { _startTime = startTime; }
-	public void setEndTime(LocalTime endTime) {
-		_endTime = endTime;
-	}
 	public void setStartNow(){
 		_startTime = LocalTime.now();
 	}
@@ -47,7 +42,7 @@ public class raceTime {
 	 * @return a string with the race time with hours, minutes, seconds and hundredths of a second
 	 */
 	public String toStringHours(){
-		String str = _athlete + " :\t";
+		String str = _athlete.getNumber() + " :\t";
 		if(_DNF){ return str + "DNF"; }
 
 		Duration d = this.getDuration();
@@ -77,7 +72,7 @@ public class raceTime {
 	 * @return string with minutes, seconds and hundredths of a secons
 	 */
 	public String toStringMinutes(){
-		String str = _athlete + " :\t";
+		String str = _athlete.getNumber() + " :\t";
 		if(_DNF){ return str + "DNF"; }
 
 		Duration d = this.getDuration();
