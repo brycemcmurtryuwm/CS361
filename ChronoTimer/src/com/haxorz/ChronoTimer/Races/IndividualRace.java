@@ -1,6 +1,7 @@
 package com.haxorz.ChronoTimer.Races;
 
 import com.haxorz.ChronoTimer.Commands.CTCommand;
+import com.haxorz.ChronoTimer.Commands.CancelCmd;
 import com.haxorz.ChronoTimer.Commands.CmdType;
 import com.haxorz.ChronoTimer.Commands.NumCmd;
 
@@ -66,8 +67,27 @@ public class IndividualRace extends Race {
                 athlete.registerForRace(this.RunNumber);
                 _didNotStartYet.add(athlete);
                 break;
+            case CANCEL:
+                CancelCmd cancelCmd = (CancelCmd) cmd;
+
+                if(!Race.COMPETITORS.containsKey(cancelCmd.AthleteNum))
+                    return;
+
+                Athlete a = Race.COMPETITORS.get(cancelCmd.AthleteNum);
+
+                _currentlyRacing.remove(a);
+                _didNotStartYet.remove(a);
+                _finished.remove(a);
+
+                a.discardRun(this.RunNumber);
+                a.registerForRace(this.RunNumber);
+                ((LinkedList<Athlete>)_didNotStartYet).add(0,a);
+                break;
+            case SWAP:
+                //TODO IMPLEMENT IN FUTURE NOT NEEDED IN SPRINT 1
+                break;
             case CLR:
-                //TODO IMPLEMENT IN FUTURE
+                //TODO IMPLEMENT IN FUTURE NOT NEEDED IN SPRINT 1
                 break;
         }
     }

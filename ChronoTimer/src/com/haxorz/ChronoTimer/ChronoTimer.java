@@ -23,6 +23,18 @@ public class ChronoTimer {
         Channel.ChannelListener = currentRace;
     }
 
+    private void Reset() {
+        Race.COMPETITORS.clear();
+        currentRace = new IndividualRace();
+        sensors = new InputSensor[12];
+
+        for (int i = 0; i < 12; i++) {
+            channels[i] = new Channel(i+1);
+        }
+
+        Channel.ChannelListener = currentRace;
+    }
+
     public void executeCmd(CTCommand cmd){
 
         if(cmd.CMDType == CmdType.POWER){
@@ -32,7 +44,8 @@ public class ChronoTimer {
 
         if(!poweredOn)
         {
-            //TODO MAKE SURE ALL DATA RESET IF POWERED OFF
+            //TODO MAKE SURE ALL DATA RESET IF POWERED OFF !!!!!!!!!!!!!!!!!!
+            Reset();
             return;
         }
 
@@ -45,31 +58,34 @@ public class ChronoTimer {
                         currentRace = new IndividualRace();
                         break;
                     case PARIND:
-                        //TODO IN THE FUTURE
+                        //TODO IN THE FUTURE NOT NEEDED IN SPRINT 1
                         break;
                     case GRP:
-                        //TODO IN THE FUTURE
+                        //TODO IN THE FUTURE NOT NEEDED IN SPRINT 1
                         break;
                     case PARGRP:
-                        //TODO IN THE FUTURE
+                        //TODO IN THE FUTURE NOT NEEDED IN SPRINT 1
                         break;
                 }
 
                 Channel.ChannelListener = currentRace;
                 return;
             case EXIT:
-                //TODO EXIT
+                //TODO EXIT!!!!!!!!!!!!
                 return;
             case RESET:
+                Reset();
                 break;
-            case CANCEL:
+            case EXPORT:
+                //TODO IN THE FUTURE NOT NEEDED IN SPRINT 1
                 break;
             case PRINT:
+                //TODO PRINT (LOG ACTIVITY AND ECHO TO A PRINTSTREAM)!!!!!!!!!!!!
                 break;
             case TIME:
                 TimeCmd time = (TimeCmd)cmd;
 
-                //TODO SET TIME
+                //TODO SET TIME!!!!!!!!!!!!!!!!!!!
                 break;
             case CONN:
                 ConnectCmd conn = (ConnectCmd)cmd;
