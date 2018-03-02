@@ -36,7 +36,7 @@ public class IndividualRace extends Race {
 
                 if(athlete != null){
                     athlete.getTimeTracker(this.RunNumber).setDNF(true);
-                    RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " DNF");
+                    RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " DNF\n");
                     _finished.add(athlete);
                 }
                 break;
@@ -71,7 +71,7 @@ public class IndividualRace extends Race {
                 break;
             case CANCEL:
                 CancelCmd cancelCmd = (CancelCmd) cmd;
-                RunRepository.addToCurrentRun("Athlete " + cancelCmd.AthleteNum + " CANCEL");
+                RunRepository.addToCurrentRun("Athlete " + cancelCmd.AthleteNum + " CANCEL\n");
 
                 if(!Race.COMPETITORS.containsKey(cancelCmd.AthleteNum))
                     return;
@@ -104,21 +104,23 @@ public class IndividualRace extends Race {
 
             if(athlete != null){
                 athlete.getTimeTracker(this.RunNumber).setStartTime(timeStamp);
-                RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 1");
+                RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 1\n");
+                _currentlyRacing.add(athlete);
             }
             else
-                RunRepository.addToCurrentRun("Athlete ??? TRIG Channel 1");
+                RunRepository.addToCurrentRun("Athlete ??? TRIG Channel 1\n");
         }
         else if(channelNum == 2){
-            Athlete athlete = _didNotStartYet.poll();
+            Athlete athlete = _currentlyRacing.poll();
 
             if(athlete != null){
                 athlete.getTimeTracker(this.RunNumber).setEndTime(timeStamp);
-                RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 2");
-                RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " ELAPSED " + athlete.getTimeTracker(this.RunNumber).getDuration());
+                RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 2\n");
+                RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " ELAPSED " + athlete.getTimeTracker(this.RunNumber).toStringMinutes() + "\n");
+                _finished.add(athlete);
             }
             else
-                RunRepository.addToCurrentRun("Athlete ??? TRIG Channel 2");
+                RunRepository.addToCurrentRun("Athlete ??? TRIG Channel 2\n");
 
         }
     }

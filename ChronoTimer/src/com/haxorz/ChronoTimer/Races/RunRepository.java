@@ -17,4 +17,7 @@ public class RunRepository {
         currentRun = "";
     }
 
+    public static String getCurrentRun() {
+        return currentRun;
+    }
 }

@@ -183,7 +183,7 @@ public abstract class CTCommand {
                 int raceNum;
 
                 if(tmpArr.length < 2)
-                    return null;
+                    return new PrintCmd(t);
 
                 try {
                     raceNum = Integer.parseInt(tmpArr[1]);

@@ -1,6 +1,7 @@
 package com.haxorz.ChronoTimer.Commands;
 
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 public class CancelCmd extends CTCommand {
 
@@ -13,7 +14,7 @@ public class CancelCmd extends CTCommand {
 
     @Override
     public String ToString() {
-        return this.TimeStamp + " " + this.CMDType + " " + AthleteNum;
+        return this.TimeStamp.format(DateTimeFormatter.ofPattern("HH:mm:ss.S")) + " " + this.CMDType + " " + AthleteNum;
     }
 
 }

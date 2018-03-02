@@ -1,6 +1,7 @@
 package com.haxorz.ChronoTimer.Commands;
 
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 public class NumCmd extends CTCommand {
 
@@ -14,6 +15,6 @@ public class NumCmd extends CTCommand {
 
     @Override
     public String ToString() {
-        return this.TimeStamp + " " + this.CMDType + " " + Number;
+        return this.TimeStamp.format(DateTimeFormatter.ofPattern("HH:mm:ss.S")) + " " + this.CMDType + " " + Number;
     }
 }

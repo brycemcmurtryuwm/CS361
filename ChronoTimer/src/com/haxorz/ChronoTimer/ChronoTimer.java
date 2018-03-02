@@ -32,6 +32,7 @@ public class ChronoTimer {
 
     private void Reset() {
         Race.COMPETITORS.clear();
+        RunRepository.CompletedRuns.clear();
         currentRace = new IndividualRace();
         sensors = new InputSensor[12];
 
@@ -89,6 +90,11 @@ public class ChronoTimer {
                 break;
             case PRINT:
                 PrintCmd printCmd = (PrintCmd)cmd;
+
+                if(printCmd.UseCurrentRun){
+                    printer.print(RunRepository.getCurrentRun());
+                    return;
+                }
 
                 if(!RunRepository.CompletedRuns.containsKey(printCmd.RaceNumber))
                     return;

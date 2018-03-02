@@ -1,6 +1,7 @@
 package com.haxorz.ChronoTimer.Commands;
 
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 public class ToggleCmd extends CTCommand {
 
@@ -13,6 +14,6 @@ public class ToggleCmd extends CTCommand {
 
     @Override
     public String ToString() {
-        return this.TimeStamp + " " + this.CMDType + " " + Channel;
+        return this.TimeStamp.format(DateTimeFormatter.ofPattern("HH:mm:ss.S")) + " " + this.CMDType + " " + Channel;
     }
 }

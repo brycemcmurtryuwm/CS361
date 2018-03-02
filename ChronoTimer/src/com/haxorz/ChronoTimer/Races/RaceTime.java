@@ -42,8 +42,7 @@ public class RaceTime {
 	 * @return a string with the race time with hours, minutes, seconds and hundredths of a second
 	 */
 	public String toStringHours(){
-		String str = _athlete.getNumber() + " :\t";
-		if(_DNF){ return str + "DNF"; }
+		String str = "";
 
 		Duration d = this.getDuration();
 
@@ -72,8 +71,7 @@ public class RaceTime {
 	 * @return string with minutes, seconds and hundredths of a secons
 	 */
 	public String toStringMinutes(){
-		String str = _athlete.getNumber() + " :\t";
-		if(_DNF){ return str + "DNF"; }
+		String str = "";
 
 		Duration d = this.getDuration();
 
