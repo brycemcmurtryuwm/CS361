@@ -12,7 +12,7 @@ public class Athlete {
         this._number = number;
     }
 
-    public RaceTime getTimeTracker(int raceNumber){ //lazy initialization
+    public RaceTime getTimeTracker(int raceNumber){
         RaceTime timeTracker = timesTracked.get(raceNumber);
 
         return timeTracker;

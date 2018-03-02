@@ -30,9 +30,9 @@ public class ChronoTimer {
         Channel.ChannelListener = currentRace;
     }
 
-    private void Reset() {
+    private void reset() {
         Race.COMPETITORS.clear();
-        RunRepository.CompletedRuns.clear();
+        RunRepository.clear();
         currentRace = new IndividualRace();
         sensors = new InputSensor[12];
 
@@ -53,8 +53,7 @@ public class ChronoTimer {
 
         if(!poweredOn)
         {
-            //TODO MAKE SURE ALL DATA RESET IF POWERED OFF !!!!!!!!!!!!!!!!!!
-            Reset();
+            reset();
             return;
         }
 
@@ -83,7 +82,7 @@ public class ChronoTimer {
                 Simulator.EXIT = true;
                 return;
             case RESET:
-                Reset();
+                reset();
                 break;
             case EXPORT:
                 //TODO IN THE FUTURE NOT NEEDED IN SPRINT 1
