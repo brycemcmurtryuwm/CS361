@@ -18,6 +18,10 @@ public class Athlete {
         return timeTracker;
     }
 
+    public void discardRun(int raceNumber){
+        timesTracked.remove(raceNumber);
+    }
+
     public void registerForRace(int raceNumber){
         timesTracked.put(raceNumber, new RaceTime(this));
     }

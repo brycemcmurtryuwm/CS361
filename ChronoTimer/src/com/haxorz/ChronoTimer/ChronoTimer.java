@@ -3,8 +3,12 @@ package com.haxorz.ChronoTimer;
 import com.haxorz.ChronoTimer.Commands.*;
 import com.haxorz.ChronoTimer.Hardware.Channel;
 import com.haxorz.ChronoTimer.Hardware.InputSensor;
+import com.haxorz.ChronoTimer.Hardware.Printer;
 import com.haxorz.ChronoTimer.Races.IndividualRace;
 import com.haxorz.ChronoTimer.Races.Race;
+import com.haxorz.ChronoTimer.Races.RunRepository;
+
+import java.io.PrintStream;
 
 public class ChronoTimer {
 
@@ -15,7 +19,23 @@ public class ChronoTimer {
     private Channel[] channels = new Channel[12];
     private InputSensor[] sensors = new InputSensor[12];
 
-    public ChronoTimer() {
+    private Printer printer;
+
+    public ChronoTimer(PrintStream out) {
+        for (int i = 0; i < 12; i++) {
+            channels[i] = new Channel(i+1);
+        }
+
+        printer = new Printer(out);
+        Channel.ChannelListener = currentRace;
+    }
+
+    private void Reset() {
+        Race.COMPETITORS.clear();
+        RunRepository.CompletedRuns.clear();
+        currentRace = new IndividualRace();
+        sensors = new InputSensor[12];
+
         for (int i = 0; i < 12; i++) {
             channels[i] = new Channel(i+1);
         }
@@ -24,6 +44,7 @@ public class ChronoTimer {
     }
 
     public void executeCmd(CTCommand cmd){
+        printer.log(cmd);
 
         if(cmd.CMDType == CmdType.POWER){
             poweredOn = !poweredOn;
@@ -32,7 +53,8 @@ public class ChronoTimer {
 
         if(!poweredOn)
         {
-            //TODO MAKE SURE ALL DATA RESET IF POWERED OFF
+            //TODO MAKE SURE ALL DATA RESET IF POWERED OFF !!!!!!!!!!!!!!!!!!
+            Reset();
             return;
         }
 
@@ -45,31 +67,43 @@ public class ChronoTimer {
                         currentRace = new IndividualRace();
                         break;
                     case PARIND:
-                        //TODO IN THE FUTURE
+                        //TODO IN THE FUTURE NOT NEEDED IN SPRINT 1
                         break;
                     case GRP:
-                        //TODO IN THE FUTURE
+                        //TODO IN THE FUTURE NOT NEEDED IN SPRINT 1
                         break;
                     case PARGRP:
-                        //TODO IN THE FUTURE
+                        //TODO IN THE FUTURE NOT NEEDED IN SPRINT 1
                         break;
                 }
 
                 Channel.ChannelListener = currentRace;
                 return;
             case EXIT:
-                //TODO EXIT
+                Simulator.EXIT = true;
                 return;
             case RESET:
+                Reset();
                 break;
-            case CANCEL:
+            case EXPORT:
+                //TODO IN THE FUTURE NOT NEEDED IN SPRINT 1
                 break;
             case PRINT:
+                PrintCmd printCmd = (PrintCmd)cmd;
+
+                if(printCmd.UseCurrentRun){
+                    printer.print(RunRepository.getCurrentRun());
+                    return;
+                }
+
+                if(!RunRepository.CompletedRuns.containsKey(printCmd.RaceNumber))
+                    return;
+                printer.print(RunRepository.CompletedRuns.get(printCmd.RaceNumber));
                 break;
             case TIME:
                 TimeCmd time = (TimeCmd)cmd;
 
-                //TODO SET TIME
+                //TODO SET TIME!!!!!!!!!!!!!!!!!!!
                 break;
             case CONN:
                 ConnectCmd conn = (ConnectCmd)cmd;

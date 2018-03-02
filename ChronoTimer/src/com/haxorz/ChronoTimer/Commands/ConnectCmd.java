@@ -3,6 +3,7 @@ package com.haxorz.ChronoTimer.Commands;
 import com.haxorz.ChronoTimer.Hardware.SensorType;
 
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 public class ConnectCmd extends CTCommand {
 
@@ -10,9 +11,15 @@ public class ConnectCmd extends CTCommand {
     public int channel;
 
     public ConnectCmd(SensorType type, int channel, LocalTime timestamp) {
-        super(CMDType.CONN, timestamp);
+        super(CmdType.CONN, timestamp);
 
         Sensor = type;
         this.channel = channel;
+    }
+
+
+    @Override
+    public String ToString() {
+        return this.TimeStamp.format(DateTimeFormatter.ofPattern("HH:mm:ss.S")) + " " + this.CMDType + " " + Sensor + " " + channel;
     }
 }

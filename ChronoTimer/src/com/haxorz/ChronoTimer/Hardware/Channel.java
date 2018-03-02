@@ -12,8 +12,6 @@ public class Channel implements HardwareEventListener {
     }
 
 
-    //channel disable/enable, connect, trigger
-
     private boolean enabled = false;
 
     public static ChannelListener ChannelListener = null;
