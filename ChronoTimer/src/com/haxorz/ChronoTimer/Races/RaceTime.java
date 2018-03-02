@@ -1,5 +1,7 @@
 package com.haxorz.ChronoTimer.Races;
 
+import com.haxorz.ChronoTimer.SystemClock;
+
 import java.time.Duration;
 import java.time.LocalTime;
 
@@ -32,10 +34,10 @@ public class RaceTime {
 	public boolean isDNF() { return _DNF; }
 	public void setDNF(boolean DNF) { this._DNF = DNF; }
 	public void setStartNow(){
-		_startTime = LocalTime.now();
+		_startTime = SystemClock.now();
 	}
 	public void setEndNow(){
-		_endTime = LocalTime.now();
+		_endTime = SystemClock.now();
 	}
 
 	/**

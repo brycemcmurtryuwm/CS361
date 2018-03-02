@@ -2,6 +2,7 @@ package com.haxorz.ChronoTimer.Commands;
 
 import com.haxorz.ChronoTimer.Hardware.SensorType;
 import com.haxorz.ChronoTimer.Races.RaceType;
+import com.haxorz.ChronoTimer.SystemClock;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
@@ -25,7 +26,7 @@ public abstract class CTCommand {
     public static CTCommand ParseFromString(String toParse){
         String[] tmpArr = toParse.trim().split("\\s+");
 
-        LocalTime t = LocalTime.now();
+        LocalTime t = SystemClock.now();
         boolean firstArgTime = true;
 
         //this tells us if it is a legal time

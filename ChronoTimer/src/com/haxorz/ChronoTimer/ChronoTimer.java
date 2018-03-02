@@ -103,7 +103,7 @@ public class ChronoTimer {
             case TIME:
                 TimeCmd time = (TimeCmd)cmd;
 
-                //TODO SET TIME!!!!!!!!!!!!!!!!!!!
+                SystemClock.setNow(time.TimeToSet);
                 break;
             case CONN:
                 ConnectCmd conn = (ConnectCmd)cmd;

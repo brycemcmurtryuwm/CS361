@@ -1,33 +1,26 @@
 package com.haxorz.ChronoTimer;
 
-import java.time.Duration;
 import java.time.LocalTime;
-import java.time.Clock;
-
-import static java.time.Clock.offset;
+import java.time.temporal.ChronoUnit;
 
 public class SystemClock {
-	Clock _clock;
 
-	public void setNow(String timeStr){
+	private static LocalTime _setTime = LocalTime.now();
+	private static long _setMillisNow = System.currentTimeMillis();
+
+	public static void setNow(String timeStr){
 		setNow(LocalTime.parse(timeStr));
 	}
 
-	public void setNow(LocalTime t){
-		LocalTime systime = LocalTime.now();
+	public static void setNow(LocalTime t){
+		_setTime = t;
 
-		//this will be negative half the time, as
-		//it should be, if we have a negative offset
-		Duration os = Duration.between(systime, t);
-
-		_clock = offset(Clock.systemDefaultZone(), os);
+		_setMillisNow = System.currentTimeMillis();
 	}
 
-	public Clock getClock() {
-		return _clock;
-	}
+	public static LocalTime now(){
+		long val = System.currentTimeMillis() - _setMillisNow;
 
-	public void setClock(Clock clock) {
-		_clock = clock;
+		return _setTime.plus(val, ChronoUnit.MILLIS);
 	}
 }
