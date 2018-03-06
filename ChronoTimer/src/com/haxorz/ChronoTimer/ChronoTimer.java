@@ -2,6 +2,7 @@ package com.haxorz.ChronoTimer;
 
 import com.haxorz.ChronoTimer.Commands.*;
 import com.haxorz.ChronoTimer.Hardware.Channel;
+import com.haxorz.ChronoTimer.Hardware.Export;
 import com.haxorz.ChronoTimer.Hardware.InputSensor;
 import com.haxorz.ChronoTimer.Hardware.Printer;
 import com.haxorz.ChronoTimer.Races.IndividualRace;
@@ -85,7 +86,16 @@ public class ChronoTimer {
                 reset();
                 break;
             case EXPORT:
-                //TODO IN THE FUTURE NOT NEEDED IN SPRINT 1
+                ExportCmd exportCmd = (ExportCmd)cmd;
+
+                if(exportCmd.UseCurrentRun){
+                    Export.SaveRunToFile(RunRepository.getCurrentRun(), currentRace.RunNumber);
+                    return;
+                }
+
+                if(!RunRepository.CompletedRuns.containsKey(exportCmd.RaceNumber))
+                    return;
+                Export.SaveRunToFile(RunRepository.CompletedRuns.get(exportCmd.RaceNumber), exportCmd.RaceNumber);
                 break;
             case PRINT:
                 PrintCmd printCmd = (PrintCmd)cmd;
