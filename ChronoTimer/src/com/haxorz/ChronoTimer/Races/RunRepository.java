@@ -20,4 +20,9 @@ public class RunRepository {
     public static String getCurrentRun() {
         return currentRun;
     }
+
+    public static void clear() {
+        currentRun = "";
+        CompletedRuns.clear();
+    }
 }

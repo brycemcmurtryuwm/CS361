@@ -16,8 +16,9 @@ public class Channel implements HardwareEventListener {
 
     public static ChannelListener ChannelListener = null;
 
-    public void ToggleChannel(){
+    public boolean ToggleChannel(){
         enabled = !enabled;
+        return enabled;
     }
 
     public void Trigger(LocalTime timeStamp){
