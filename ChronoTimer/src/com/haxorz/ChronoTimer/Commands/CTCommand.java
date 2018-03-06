@@ -200,8 +200,16 @@ public abstract class CTCommand {
                 //TODO IN THE FUTURE NOT NEEDED IN SPRINT 1
                 return null;
             case "export":
-                //TODO IN THE FUTURE NOT NEEDED IN SPRINT 1
-                return null;
+                if(tmpArr.length < 2)
+                    return new ExportCmd(t);
+
+                try {
+                    raceNum = Integer.parseInt(tmpArr[1]);
+                }catch (Exception e){
+                    return null;
+                }
+
+                return new ExportCmd(t, raceNum);
             default:
                 return null;
         }
