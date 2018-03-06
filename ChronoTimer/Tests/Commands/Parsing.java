@@ -1,7 +1,8 @@
 package Commands;
 import com.haxorz.ChronoTimer.Commands.*;
-import com.sun.org.apache.bcel.internal.generic.INSTANCEOF;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 public class Parsing {
 

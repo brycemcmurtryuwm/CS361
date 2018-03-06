@@ -1,6 +1,6 @@
 package com.haxorz.lab7;
 
-public class Employee {
+public class Employee implements Comparable<Employee>{
 	private String _firstName;
 	private String _lastName;
 	private String _department;
@@ -47,7 +47,7 @@ public class Employee {
 
 	@Override
 	public String toString() {
-		return _firstName + _lastName + _department +  _phoneNumber;
+		return _lastName + ", " + _firstName + " " + _phoneNumber + " " + _department;
 	}
 
 	@Override
@@ -70,5 +70,10 @@ public class Employee {
 		result = 31 * result + (_department != null ? _department.hashCode() : 0);
 		result = 31 * result + (_phoneNumber != null ? _phoneNumber.hashCode() : 0);
 		return result;
+	}
+
+	@Override
+	public int compareTo(Employee o) {
+		return this._lastName.compareToIgnoreCase(o._lastName);
 	}
 }
