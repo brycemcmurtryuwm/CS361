@@ -137,23 +137,23 @@ public class ParIndRace extends Race {
 
 			if(athlete != null){
 				athlete.getTimeTracker(this.RunNumber).setStartTime(timeStamp);
-				RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 1\n");
+				RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 3\n");
 				_currentlyRacing2.add(athlete);
 			}
 			else
-				RunRepository.addToCurrentRun("Athlete ??? TRIG Channel 1\n");
+				RunRepository.addToCurrentRun("Athlete ??? TRIG Channel 3\n");
 		}
 		else if(channelNum == 4){
 			Athlete athlete = _currentlyRacing2.poll();
 
 			if(athlete != null){
 				athlete.getTimeTracker(this.RunNumber).setEndTime(timeStamp);
-				RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 2\n");
+				RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 4\n");
 				RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " ELAPSED " + athlete.getTimeTracker(this.RunNumber).toStringMinutes() + "\n");
 				_finished.add(athlete);
 			}
 			else
-				RunRepository.addToCurrentRun("Athlete ??? TRIG Channel 2\n");
+				RunRepository.addToCurrentRun("Athlete ??? TRIG Channel 4\n");
 
 		}
 	}
