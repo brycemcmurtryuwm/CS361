@@ -6,11 +6,16 @@ public class Employee implements Comparable<Employee>{
 	private String _department;
 	private String _phoneNumber;
 
-	public Employee(String firstName, String lastName, String department, String phoneNumber) {
+	private Title _title;
+	private Gender _gender;
+
+	public Employee(String firstName, String lastName, String department, String phoneNumber, Title title, Gender gender) {
 		_firstName = firstName;
 		_lastName = lastName;
 		_department = department;
 		_phoneNumber = phoneNumber;
+		_title = title;
+		_gender = gender;
 	}
 
 	public String getFirstName() {
@@ -75,5 +80,13 @@ public class Employee implements Comparable<Employee>{
 	@Override
 	public int compareTo(Employee o) {
 		return this._lastName.compareToIgnoreCase(o._lastName);
+	}
+
+	public Title getTitle() {
+		return _title;
+	}
+
+	public Gender getGender() {
+		return _gender;
 	}
 }

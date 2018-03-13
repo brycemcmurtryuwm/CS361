@@ -44,7 +44,7 @@ public class DirectoryCmd {
                 dept = tmpArr[2];
                 phone = tmpArr[3];
 
-                return new DirectoryCmd(new Employee(firstName, lastName, dept, phone));
+                return new DirectoryCmd(new Employee(firstName, lastName, dept, phone, title, gender));
         }
 
     }

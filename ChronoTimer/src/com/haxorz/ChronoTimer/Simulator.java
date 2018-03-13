@@ -23,7 +23,8 @@ public class Simulator {
 
                     do{
                         System.out.println("Enter File Name/Path: ");
-                        path = sc.next();
+                        path = sc.nextLine();
+                        path.trim();
                         f = new File(path);
                     }while (f == null || !f.exists());
 
