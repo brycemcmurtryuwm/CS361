@@ -1,13 +1,10 @@
 package Races;
 
-import com.haxorz.ChronoTimer.Commands.*;
 import com.haxorz.ChronoTimer.Races.Athlete;
 import com.haxorz.ChronoTimer.Races.RaceTime;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;ppackage Commands;
-import com.haxorz.ChronoTimer.Commands.*;
-import org.junit.*;
+import org.junit.Test;
 
 import java.time.LocalTime;
 

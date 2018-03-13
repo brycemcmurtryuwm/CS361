@@ -12,7 +12,7 @@ public abstract class Race implements ChannelListener{
 
     public static final HashMap<Integer,Athlete> COMPETITORS = new HashMap<>();
 
-    public int RunNumber = 1;
+    public static int RunNumber = 0;
 
     public abstract RaceType getRaceType();
 
