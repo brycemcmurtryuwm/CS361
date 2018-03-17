@@ -11,6 +11,8 @@ import java.time.LocalTime;
 public class TestRaceTime {
 	RaceTime rt;
 
+	//TODO test sysClock chanag3ed in middle of race
+
 	@Before
 	public void before() {
 		rt = new RaceTime(new Athlete(1));
