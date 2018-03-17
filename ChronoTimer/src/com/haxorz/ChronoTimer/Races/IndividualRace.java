@@ -6,6 +6,7 @@ import com.haxorz.ChronoTimer.Commands.CmdType;
 import com.haxorz.ChronoTimer.Commands.NumCmd;
 
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -77,7 +78,6 @@ public class IndividualRace extends Race {
                     return;
 
                 Athlete a = Race.COMPETITORS.get(cancelCmd.AthleteNum);
-
                 _currentlyRacing.remove(a);
                 _didNotStartYet.remove(a);
                 _finished.remove(a);
@@ -87,7 +87,10 @@ public class IndividualRace extends Race {
                 ((LinkedList<Athlete>)_didNotStartYet).add(0,a);
                 break;
             case SWAP:
-                //TODO IMPLEMENT IN FUTURE NOT NEEDED IN SPRINT 1
+                if(_currentlyRacing.size() < 2)
+                    break;
+
+                Collections.swap((LinkedList<Athlete>)_currentlyRacing,0,1);
                 break;
             case CLR:
                 //TODO IMPLEMENT IN FUTURE NOT NEEDED IN SPRINT 1

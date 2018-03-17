@@ -208,8 +208,16 @@ public abstract class CTCommand {
                 //TODO IN THE FUTURE NOT NEEDED IN SPRINT 1
                 return null;
             case "swap":
-                //TODO IN THE FUTURE NOT NEEDED IN SPRINT 1
-                return null;
+                if(tmpArr.length < 2)
+                    return new SwapCmd(t);
+
+                try {
+                    channel = Integer.parseInt(tmpArr[1]);
+                }catch (Exception e){
+                    return null;
+                }
+
+                return new SwapCmd(t, channel);
             case "export":
                 if(tmpArr.length < 2)
                     return new ExportCmd(t);

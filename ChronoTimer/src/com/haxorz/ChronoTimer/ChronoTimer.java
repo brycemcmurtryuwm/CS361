@@ -91,13 +91,13 @@ public class ChronoTimer {
                 ExportCmd exportCmd = (ExportCmd)cmd;
 
                 if(exportCmd.UseCurrentRun){
-                    Export.SaveRunToFile(RunRepository.getCurrentRun(), currentRace.RunNumber);
+                    Export.SaveRunToFile(currentRace.RunNumber);
                     return;
                 }
 
                 if(!RunRepository.CompletedRuns.containsKey(exportCmd.RaceNumber))
                     return;
-                Export.SaveRunToFile(RunRepository.CompletedRuns.get(exportCmd.RaceNumber), exportCmd.RaceNumber);
+                Export.SaveRunToFile(exportCmd.RaceNumber);
                 break;
             case PRINT:
                 PrintCmd printCmd = (PrintCmd)cmd;

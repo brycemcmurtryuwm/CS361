@@ -1,6 +1,7 @@
 package com.haxorz.ChronoTimer.Hardware;
 
 import com.google.gson.Gson;
+import com.haxorz.ChronoTimer.Races.RunRepository;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -8,9 +9,9 @@ import java.io.IOException;
 
 public class Export {
 
-    public static void SaveRunToFile(String run, int runNum){
+    public static void SaveRunToFile(int runNum){
         Gson gson = new Gson();
-        String json = gson.toJson(run);
+        String json = gson.toJson(RunRepository.getAthletsStatus(runNum));
 
         File file = new File("RUN" + runNum + ".txt");
         try {
@@ -19,6 +20,7 @@ public class Export {
 
             writer.write(json);
             writer.close();
+
 
         } catch (IOException e) {
             e.printStackTrace();

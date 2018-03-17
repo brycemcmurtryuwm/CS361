@@ -19,11 +19,14 @@ public class Athlete {
     }
 
     public void discardRun(int raceNumber){
+
         timesTracked.remove(raceNumber);
+        RunRepository.removeAthlete(raceNumber, this);
     }
 
     public void registerForRace(int raceNumber){
         timesTracked.put(raceNumber, new RaceTime(this));
+        RunRepository.addAthlete(raceNumber, this);
     }
 
     public int getNumber(){

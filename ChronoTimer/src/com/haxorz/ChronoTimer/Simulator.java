@@ -14,7 +14,7 @@ public class Simulator {
             System.out.println("To read from a file press '1' to use the console press '2'");
 
             Scanner sc = new Scanner(System.in);
-            String tmp = sc.next();
+            String tmp = sc.nextLine();
             try{
                 int choice = Integer.parseInt(tmp);
                 if(choice == 1){

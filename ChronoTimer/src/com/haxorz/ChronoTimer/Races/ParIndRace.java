@@ -3,6 +3,7 @@ package com.haxorz.ChronoTimer.Races;
 import com.haxorz.ChronoTimer.Commands.*;
 
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -95,7 +96,19 @@ public class ParIndRace extends Race {
 				((LinkedList<Athlete>)_didNotStartYet).add(0,a);
 				break;
 			case SWAP:
-				//TODO IMPLEMENT IN FUTURE NOT NEEDED IN SPRINT 1
+				SwapCmd swap = (SwapCmd)cmd;
+				if(swap.ChannelNum == 1){
+					if(_currentlyRacing1.size() < 2)
+						break;
+
+					Collections.swap((LinkedList<Athlete>)_currentlyRacing1,0,1);
+				}
+				else {
+					if(_currentlyRacing2.size() < 2)
+						break;
+
+					Collections.swap((LinkedList<Athlete>)_currentlyRacing2,0,1);
+				}
 				break;
 			case CLR:
 				//TODO IMPLEMENT IN FUTURE NOT NEEDED IN SPRINT 1
