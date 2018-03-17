@@ -62,18 +62,18 @@ public abstract class CTCommand {
             case "reset":
                 return new GenericCmd(CmdType.RESET, t);
             case "dnf":
-                int DNFRacerNumber;
+                int lane;
 
                 if(tmpArr.length < 2)
-                    return null;
+                    return new DNFCommand(t);
 
                 try {
-                    DNFRacerNumber = Integer.parseInt(tmpArr[1]);
+                    lane = Integer.parseInt(tmpArr[1]);
                 }catch (Exception e){
                     return null;
                 }
 
-                return new DNFCommand(t, DNFRacerNumber);
+                return new DNFCommand(t, lane);
             case "cancel":
                 int racer;
 
