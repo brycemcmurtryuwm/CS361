@@ -4,19 +4,21 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 public class DNFCommand extends CTCommand {
-	int athleteNumber;
+	int lane;
 
-	public DNFCommand(LocalTime timeStamp, int a) {
+	public DNFCommand(LocalTime timeStamp, int lane) {
 		super(CmdType.DNF, timeStamp);
-		this.athleteNumber = a;
+		this.lane = lane;
 	}
-
-	public int getAthleteNumber() {
-		return athleteNumber;
+	public DNFCommand(LocalTime timeStamp) {
+		this(timeStamp, 1);
+	}
+	public int getLane() {
+		return lane;
 	}
 
 	@Override
 	public String ToString() {
-		return this.TimeStamp.format(DateTimeFormatter.ofPattern("HH:mm:ss.S")) + " " + this.CMDType + " " + athleteNumber;
+		return this.TimeStamp.format(DateTimeFormatter.ofPattern("HH:mm:ss.S")) + " " + this.CMDType + " " + lane;
 	}
 }
