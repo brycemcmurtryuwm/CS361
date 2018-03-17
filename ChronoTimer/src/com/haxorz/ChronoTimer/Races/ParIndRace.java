@@ -32,7 +32,7 @@ public class ParIndRace extends Race {
 			case DNF:
 				DNFCommand dnfcmd = (DNFCommand)cmd;
 
-				//creates an athlete with the number of the one to be DNF'd
+				/*//creates an athlete with the number of the one to be DNF'd
 				Athlete athlete = new Athlete(dnfcmd.getAthleteNumber());
 
 				athlete = COMPETITORS.get(athlete.getNumber());
@@ -42,7 +42,16 @@ public class ParIndRace extends Race {
 
 				//ensures that the athlete isn't in there twice
 				_finished.remove(athlete);
-				_finished.offer(athlete);
+				_finished.offer(athlete);*/
+				if(dnfcmd.getLane() != 1 && dnfcmd.getLane() != 2) break;
+
+				Athlete athlete = dnfcmd.getLane() == 1?_currentlyRacing1.poll(): _currentlyRacing2.poll();
+
+				if(athlete != null){
+					athlete.getTimeTracker(this.RunNumber).setDNF(true);
+					RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " DNF\n");
+					_finished.add(athlete);
+				}
 				break;
 			case NEWRUN:
 			case ENDRUN:
