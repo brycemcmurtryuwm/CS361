@@ -93,4 +93,15 @@ public class RaceTime {
 
 		return str;
 	}
+
+	/**
+	 * @return string with minutes, seconds and hundredths of a seconds or DNF
+	 */
+	public String toString(){
+		if(isDNF()){
+			return "Athlete " + _athlete.getNumber() + " DNF";
+		}
+
+		return "Athlete " + _athlete.getNumber() + " ELAPSED " + toStringMinutes();
+	}
 }
