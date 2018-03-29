@@ -1,6 +1,7 @@
 package com.haxorz.lab7;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface Directory {
 
@@ -9,4 +10,6 @@ public interface Directory {
 	boolean print();
 
 	void clear();
+
+    List<Employee> getAllEmployees();
 }

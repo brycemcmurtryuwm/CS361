@@ -29,4 +29,9 @@ public class MainDirectory implements Directory {
     public void clear(){
         _dir.clear();
     }
+
+    @Override
+    public List<Employee> getAllEmployees() {
+        return new ArrayList<>(_dir);
+    }
 }

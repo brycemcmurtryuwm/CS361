@@ -7,6 +7,13 @@ import java.awt.event.ActionListener;
 
 public class GuiDirEditor extends JFrame{
 
+	private JTextField givenNameField;
+	private JTextField surnameField;
+	private JTextField deptField;
+	private JTextField phoneField;
+	private JComboBox<Title> titleList;
+	private ButtonGroup genderButtons;
+
 	public GuiDirEditor(){
 		this.setSize(500,500);
 		createComponents();
@@ -23,20 +30,24 @@ public class GuiDirEditor extends JFrame{
 		JLabel genderLabel = new JLabel("Gender");
 		JLabel titleLabel = new JLabel("Title");
 
-		JTextField givenNameField = new JTextField();
-		JTextField surnameField = new JTextField();
-		JTextField deptField = new JTextField();
-		JTextField phoneField = new JTextField();
+		givenNameField = new JTextField();
+		surnameField = new JTextField();
+		deptField = new JTextField();
+		phoneField = new JTextField();
 
 
 		//the radioButtons for gender
 		JPanel gendersPanel = new JPanel(new FlowLayout());
 
 		JRadioButton maleButton = new JRadioButton("Male");
+		maleButton.setActionCommand("Male");
+		maleButton.setSelected(true);
 		JRadioButton femaleButton = new JRadioButton("Female");
+		femaleButton.setActionCommand("Female");
 		JRadioButton otherButton = new JRadioButton("Other");
+		otherButton.setActionCommand("Other");
 
-		ButtonGroup genderButtons = new ButtonGroup();
+		genderButtons = new ButtonGroup();
 		genderButtons.add(maleButton);
 		genderButtons.add(femaleButton);
 		genderButtons.add(otherButton);
@@ -46,8 +57,7 @@ public class GuiDirEditor extends JFrame{
 		gendersPanel.add(otherButton);
 
 		//drop down list for titles
-		String[] titleStrings = { "Mr", "Ms", "Mrs", "Dr", "Col", "Prof" };
-		JComboBox titleList = new JComboBox(titleStrings);
+		titleList = new JComboBox<>(Title.values());
 
 		datafields.add(givenNameLabel);
 		datafields.add(givenNameField);
@@ -65,26 +75,35 @@ public class GuiDirEditor extends JFrame{
 		this.add(datafields, BorderLayout.CENTER);
 
 		JPanel buttons = new JPanel(new FlowLayout());
+		JButton print = new JButton("Print");
+		JButton clear = new JButton("Clear");
 		JButton submit = new JButton("Submit");
 		JButton exit = new JButton("Exit");
 
+		submit.addActionListener(new submitListener());
+		exit.addActionListener(e -> CloseWindow());
+		print.addActionListener(e -> Client.sendCmd(DirectoryCmdType.Print));
+		clear.addActionListener(e -> Client.sendCmd(DirectoryCmdType.Clear));
+
+		buttons.add(print);
+		buttons.add(clear);
 		buttons.add(submit);
 		buttons.add(exit);
 
 		this.add(buttons, BorderLayout.PAGE_END);
+	}
 
-
-
+	private void CloseWindow() {
+		super.dispose();
 	}
 
 	public class submitListener implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
+			Employee employee = new Employee(givenNameField.getText(), surnameField.getText(), deptField.getText(), phoneField.getText(),
+					titleList.getItemAt(titleList.getSelectedIndex()), Gender.valueOf(genderButtons.getSelection().getActionCommand()));
 
-
-
-
-			return;
+			Client.sendEmployeesToDir(employee);
 		}
 	}
 
