@@ -1,5 +1,7 @@
 package com.haxorz.lab7;
 
+import java.util.List;
+
 public class DirectoryProxy implements Directory {
 
     private MainDirectory _directory = new MainDirectory();
@@ -18,5 +20,10 @@ public class DirectoryProxy implements Directory {
     @Override
     public void clear() {
         _directory.clear();
+    }
+
+    @Override
+    public List<Employee> getAllEmployees() {
+        return _directory.getAllEmployees();
     }
 }

@@ -25,6 +25,13 @@ public class DirectoryEditor {
     public void executeCmd(DirectoryCmd cmd) {
         switch (cmd.Type){
             case Add:
+                if(cmd instanceof AddCmd){
+                    AddCmd add = (AddCmd)cmd;
+
+                    _directory.add(Transport.EmployeesAsJson(add.employeesToAdd));
+                    return;
+                }
+
                 _mode = DirectoryCmdType.Add;
                 break;
             case Clear:
@@ -43,6 +50,10 @@ public class DirectoryEditor {
                 }
                 break;
         }
+    }
+
+    public List<Employee> listAllEmployees(){
+        return _directory.getAllEmployees();
     }
 }
 

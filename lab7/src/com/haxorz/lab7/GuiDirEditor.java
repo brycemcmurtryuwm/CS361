@@ -7,19 +7,14 @@ import java.awt.event.ActionListener;
 
 public class GuiDirEditor extends JFrame{
 
-	private DirectoryEditor _directoryEditor;
-
-	private JTextField _givenNameField;
-	private JTextField _surnameField;
-	private JTextField _deptField;
-	private JTextField _phoneField;
-	private JRadioButton _maleButton;
-	private JRadioButton _femaleButton;
-	private JRadioButton _otherButton;
-	private JComboBox _titleList;
+	private JTextField givenNameField;
+	private JTextField surnameField;
+	private JTextField deptField;
+	private JTextField phoneField;
+	private JComboBox<Title> titleList;
+	private ButtonGroup genderButtons;
 
 	public GuiDirEditor(){
-		_directoryEditor = new DirectoryEditor(System.out);
 		this.setSize(600,500);
 		this.setTitle("Haxors Directory Editor");
 		createComponents();
@@ -45,81 +40,98 @@ public class GuiDirEditor extends JFrame{
 		JLabel titleLabel = new JLabel("Title");
 		titleLabel.setFont(font);
 
-		_givenNameField = new JTextField();
-		_givenNameField.setFont(font);
-		_surnameField = new JTextField();
-		_surnameField.setFont(font);
-		_deptField = new JTextField();
-		_deptField.setFont(font);
-		_phoneField = new JTextField();
-		_phoneField.setFont(font);
+		givenNameField = new JTextField();
+		surnameField = new JTextField();
+		deptField = new JTextField();
+		phoneField = new JTextField();
+
+		givenNameField.setFont(font);
+		surnameField.setFont(font);
+		deptField.setFont(font);
+		phoneField.setFont(font);
 
 
 		//the radioButtons for gender
 		JPanel gendersPanel = new JPanel(new FlowLayout());
 
-		_maleButton = new JRadioButton("Male");
-		_maleButton.setFont(font);
-		_femaleButton = new JRadioButton("Female");
-		_femaleButton.setFont(font);
-		_otherButton = new JRadioButton("Other");
-		_otherButton.setFont(font);
+		JRadioButton maleButton = new JRadioButton("Male");
+		maleButton.setActionCommand("Male");
+		maleButton.setSelected(true);
+		JRadioButton femaleButton = new JRadioButton("Female");
+		femaleButton.setActionCommand("Female");
+		JRadioButton otherButton = new JRadioButton("Other");
+		otherButton.setActionCommand("Other");
 
-		ButtonGroup genderButtons = new ButtonGroup();
-		genderButtons.add(_maleButton);
-		genderButtons.add(_femaleButton);
-		genderButtons.add(_otherButton);
+		genderButtons = new ButtonGroup();
+		genderButtons.add(maleButton);
+		genderButtons.add(femaleButton);
+		genderButtons.add(otherButton);
 
-		gendersPanel.add(_maleButton);
-		gendersPanel.add(_femaleButton);
-		gendersPanel.add(_otherButton);
+		maleButton.setFont(font);
+		femaleButton.setFont(font);
+		otherButton.setFont(font);
+
+		gendersPanel.add(maleButton);
+		gendersPanel.add(femaleButton);
+		gendersPanel.add(otherButton);
 
 		//drop down list for titles
-		String[] titleStrings = { "Mr", "Ms", "Mrs", "Dr", "Col", "Prof" };
-		_titleList = new JComboBox(titleStrings);
-		_titleList.setFont(font);
+
+		titleList = new JComboBox<>(Title.values());
+		titleList.setFont(font);
 
 		datafields.add(givenNameLabel);
-		datafields.add(_givenNameField);
+		datafields.add(givenNameField);
 		datafields.add(surnameLabel);
-		datafields.add(_surnameField);
+		datafields.add(surnameField);
 		datafields.add(deptLabel);
-		datafields.add(_deptField);
+		datafields.add(deptField);
 		datafields.add(phoneLabel);
-		datafields.add(_phoneField);
+		datafields.add(phoneField);
 		datafields.add(genderLabel);
 		datafields.add(gendersPanel);
 		datafields.add(titleLabel);
-		datafields.add(_titleList);
+		datafields.add(titleList);
 
 		this.add(datafields, BorderLayout.CENTER);
 
 		JPanel buttons = new JPanel(new FlowLayout());
+		JButton print = new JButton("Print");
+		JButton clear = new JButton("Clear");
 		JButton submit = new JButton("Submit");
 		submit.setFont(font);
+		print.setFont(font);
+		clear.setFont(font);
 		JButton exit = new JButton("Exit");
 		exit.setFont(font);
 
+		submit.addActionListener(new submitListener());
+		exit.addActionListener(e -> CloseWindow());
+		print.addActionListener(e -> Client.sendCmd(DirectoryCmdType.Print));
+		clear.addActionListener(e -> Client.sendCmd(DirectoryCmdType.Clear));
+
+		buttons.add(print);
+		buttons.add(clear);
 		buttons.add(submit);
 		buttons.add(exit);
 
 		this.add(buttons, BorderLayout.PAGE_END);
-
-		submit.addActionListener(new submitListener());
-		exit.addActionListener(new exitListener());
+	}
 
 
+	private void CloseWindow() {
+		super.dispose();
 
+		System.exit(0);
 	}
 
 	public class submitListener implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
-
-			String givenName = _givenNameField.getText();
-			String surname = _surnameField.getText();
-			String department = _deptField.getText();
-			String phone = _phoneField.getText();
+			String givenName = givenNameField.getText();
+			String surname = surnameField.getText();
+			String department = deptField.getText();
+			String phone = phoneField.getText();
 
 			if(givenName.equals("")){
 				JOptionPane.showMessageDialog(new Frame(), "Given Name field is empty");
@@ -137,59 +149,11 @@ public class GuiDirEditor extends JFrame{
 				JOptionPane.showMessageDialog(new Frame(), "Phone field is empty");
 				return;
 			}
-			if(!(_maleButton.isSelected() || _femaleButton.isSelected() || _otherButton.isSelected())){
-				JOptionPane.showMessageDialog(new Frame(), "No gender selected");
-				return;
-			}
 
-			//determine gender
-			Gender gender;
-			if(_maleButton.isSelected()) gender = Gender.Male;
-			else if(_femaleButton.isSelected()) gender = Gender.Female;
-			else if(_otherButton.isSelected()) gender = Gender.Other;
-			else return;
+			Employee employee = new Employee(givenName, surname, department, phone,
+					titleList.getItemAt(titleList.getSelectedIndex()), Gender.valueOf(genderButtons.getSelection().getActionCommand()));
 
-			Title title;
-			switch((String)_titleList.getSelectedItem()){
-				case("Mr"):{
-					title = Title.Mr;
-					break;
-				}
-				case("Ms"):{
-					title = Title.Ms;
-					break;
-				}
-				case("Mrs"):{
-					title = Title.Mrs;
-					break;
-				}
-				case("Dr"):{
-					title = Title.Dr;
-					break;
-				}
-				case("Col"):{
-					title = Title.Col;
-					break;
-				}
-				case("Prof"):{
-					title = Title.Prof;
-					break;
-				}
-				default: return;
-			}
-
-
-			Employee entered = new Employee(givenName, surname, department, phone, title, gender);
-
-			_directoryEditor.executeCmd(new DirectoryCmd(entered));
-
-			return;
-		}
-	}
-	public class exitListener implements ActionListener {
-
-		public void actionPerformed(ActionEvent e) {
-			System.exit(0);
+			Client.sendEmployeesToDir(employee);
 		}
 	}
 
