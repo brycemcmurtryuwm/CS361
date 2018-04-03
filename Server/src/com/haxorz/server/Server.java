@@ -39,7 +39,9 @@ public class Server {
         // create a context to get the request to display the results
         server.createContext("/displayresults", new DisplayHandler());
         
-        server.createContext("/displayresults/directory", new DisplayHandler2());
+        server.createContext("/displayresults/directory", new HTMLHandler());
+
+        server.createContext("/displayresults/style.css", new CSSHandler());
 
         // create a context to get the request for the POST
         server.createContext("/sendresults",new PostHandler());
@@ -50,13 +52,16 @@ public class Server {
         server.start();
     }
     
-    static class DisplayHandler2 implements HttpHandler{
+    static class HTMLHandler implements HttpHandler{
 
 		@Override
 		public void handle(HttpExchange t) throws IOException {
 			// TODO Auto-generated method stub
 			String response = "<!DOCTYPE html>\r\n" + 
-					"<html>\r\n" + 
+					"<html>\r\n" +
+                    "<head>\n" +
+                    "  <link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">\r\n" +
+                    "</head>\r\n" +
 					"<body>\r\n" + 
 					"<table id=\"Employees\">\r\n" + 
 					"  <tr id=\"Header\">\r\n" + 
@@ -91,6 +96,41 @@ public class Server {
             os.close();
 		}
     	
+    }
+
+    static class CSSHandler implements HttpHandler{
+
+        @Override
+        public void handle(HttpExchange t) throws IOException {
+            // TODO Auto-generated method stub
+            String response = "#Employees {\n" +
+                    "    font-family: \"Trebuchet MS\", Arial, Helvetica, sans-serif;\n" +
+                    "    border-collapse: collapse;\n" +
+                    "    width: 100%;\n" +
+                    "}\n" +
+                    "\n" +
+                    "#Employees td, #Employees th {\n" +
+                    "    border: 1px solid #ddd;\n" +
+                    "    padding: 8px;\n" +
+                    "}\n" +
+                    "\n" +
+                    "#Employees tr:nth-child(even){background-color: #bfbfbf;}\n" +
+                    "\n" +
+                    "#Employees tr:hover {background-color: #ddd;}\n" +
+                    "\n" +
+                    "#Employees th {\n" +
+                    "    padding-top: 12px;\n" +
+                    "    padding-bottom: 12px;\n" +
+                    "    text-align: left;\n" +
+                    "    background-color: #009933;\n" +
+                    "    color: white;\n" +
+                    "}";
+            t.sendResponseHeaders(200, response.length());
+            OutputStream os = t.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+        }
+
     }
 
     static class DisplayHandler implements HttpHandler {
