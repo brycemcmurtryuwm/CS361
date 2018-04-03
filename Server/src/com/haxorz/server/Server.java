@@ -74,7 +74,9 @@ public class Server {
 					"  </tr>\r\n";
 			
 			List<Employee> e = directoryEditor.listAllEmployees();
-			for(Employee i: e) {
+			Collections.sort(e);
+
+            for(Employee i: e) {
 				response += "<tr>\r\n" + 
 						"    <td>"+ i.getTitle() +"</td>\r\n" + 
 						"    <td>"+ i.getFirstName() +"</td>\r\n" + 
@@ -109,7 +111,7 @@ public class Server {
                     "    width: 100%;\n" +
                     "}\n" +
                     "\n" +
-                    "#Employees td, #Employees th {\n" +
+                    "#Employees td, #Header th {\n" +
                     "    border: 1px solid #ddd;\n" +
                     "    padding: 8px;\n" +
                     "}\n" +
@@ -118,7 +120,7 @@ public class Server {
                     "\n" +
                     "#Employees tr:hover {background-color: #ddd;}\n" +
                     "\n" +
-                    "#Employees th {\n" +
+                    "#Header th {\n" +
                     "    padding-top: 12px;\n" +
                     "    padding-bottom: 12px;\n" +
                     "    text-align: left;\n" +
