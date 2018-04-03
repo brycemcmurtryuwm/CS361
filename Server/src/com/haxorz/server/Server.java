@@ -38,6 +38,8 @@ public class Server {
 
         // create a context to get the request to display the results
         server.createContext("/displayresults", new DisplayHandler());
+        
+        server.createContext("/displayresults/directory", new DisplayHandler2());
 
         // create a context to get the request for the POST
         server.createContext("/sendresults",new PostHandler());
@@ -46,6 +48,49 @@ public class Server {
         // get it going
         System.out.println("Starting Server...");
         server.start();
+    }
+    
+    static class DisplayHandler2 implements HttpHandler{
+
+		@Override
+		public void handle(HttpExchange t) throws IOException {
+			// TODO Auto-generated method stub
+			String response = "<!DOCTYPE html>\r\n" + 
+					"<html>\r\n" + 
+					"<body>\r\n" + 
+					"<table id=\"Employees\">\r\n" + 
+					"  <tr id=\"Header\">\r\n" + 
+					"    <th>Title</th>\r\n" + 
+					"    <th>First Name</th>\r\n" + 
+					"    <th>Last Name</th>\r\n" + 
+					"    <th>Department</th>\r\n" + 
+					"    <th>Phone</th>\r\n" + 
+					"    <th>Gender</th>\r\n" + 
+					"  </tr>\r\n";
+			
+			List<Employee> e = directoryEditor.listAllEmployees();
+			for(Employee i: e) {
+				response += "<tr>\r\n" + 
+						"    <td>"+ i.getTitle() +"</td>\r\n" + 
+						"    <td>"+ i.getFirstName() +"</td>\r\n" + 
+						"    <td>"+ i.getLastName() +"</td>\r\n" + 
+						"    <td>"+ i.getDepartment() +"</td>\r\n" + 
+						"    <td>"+ i.getPhoneNumber() +"</td>\r\n" + 
+						"    <td>"+ i.getGender() +"</td>\r\n" + 
+						"  </tr>\r\n";
+			}
+			
+			response += "</table>\r\n" + 
+					"\r\n" + 
+					"</body>\r\n" + 
+					"</html>";
+			
+			t.sendResponseHeaders(200, response.length());
+            OutputStream os = t.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+		}
+    	
     }
 
     static class DisplayHandler implements HttpHandler {
