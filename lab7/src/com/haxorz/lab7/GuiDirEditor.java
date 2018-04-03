@@ -100,6 +100,8 @@ public class GuiDirEditor extends JFrame{
 		JButton clear = new JButton("Clear");
 		JButton submit = new JButton("Submit");
 		submit.setFont(font);
+		print.setFont(font);
+		clear.setFont(font);
 		JButton exit = new JButton("Exit");
 		exit.setFont(font);
 
