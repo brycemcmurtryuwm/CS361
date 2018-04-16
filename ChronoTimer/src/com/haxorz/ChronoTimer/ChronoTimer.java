@@ -5,10 +5,7 @@ import com.haxorz.ChronoTimer.Hardware.Channel;
 import com.haxorz.ChronoTimer.Hardware.Export;
 import com.haxorz.ChronoTimer.Hardware.InputSensor;
 import com.haxorz.ChronoTimer.Hardware.Printer;
-import com.haxorz.ChronoTimer.Races.IndividualRace;
-import com.haxorz.ChronoTimer.Races.ParIndRace;
-import com.haxorz.ChronoTimer.Races.Race;
-import com.haxorz.ChronoTimer.Races.RunRepository;
+import com.haxorz.ChronoTimer.Races.*;
 
 import java.io.PrintStream;
 
@@ -72,7 +69,7 @@ public class ChronoTimer {
                         currentRace = new ParIndRace();
                         break;
                     case GRP:
-                        //TODO IN THE FUTURE NOT NEEDED IN SPRINT 1
+                        currentRace = new GrpRace();
                         break;
                     case PARGRP:
                         //TODO IN THE FUTURE NOT NEEDED IN SPRINT 1
@@ -91,7 +88,7 @@ public class ChronoTimer {
                 ExportCmd exportCmd = (ExportCmd)cmd;
 
                 if(exportCmd.UseCurrentRun){
-                    Export.SaveRunToFile(currentRace.RunNumber);
+                    Export.SaveRunToFile(Race.RunNumber);
                     return;
                 }
 
