@@ -1,9 +1,6 @@
 package com.haxorz.ChronoTimer.Races;
 
-import com.haxorz.ChronoTimer.Commands.CTCommand;
-import com.haxorz.ChronoTimer.Commands.CancelCmd;
-import com.haxorz.ChronoTimer.Commands.CmdType;
-import com.haxorz.ChronoTimer.Commands.NumCmd;
+import com.haxorz.ChronoTimer.Commands.*;
 
 import java.time.LocalTime;
 import java.util.LinkedList;
@@ -20,8 +17,6 @@ public class GrpRace extends Race {
     public GrpRace() {
         _runStore = new LinkedList<>();
         _finished = new LinkedList<>();
-
-
     }
 
     @Override
@@ -38,7 +33,7 @@ public class GrpRace extends Race {
                 break;
             case NEWRUN:
             case ENDRUN:
-                //TODO discard unassigned runtimes
+                //discard unassigned runtimes
                 _runStore.clear();
                 _finished.clear();
                 RunRepository.EndCurrentRun(Race.RunNumber);
@@ -75,24 +70,13 @@ public class GrpRace extends Race {
                 }
                 break;
             case CANCEL:
-                //TODO NO Cancel
-
-                CancelCmd cancelCmd = (CancelCmd) cmd;
-                RunRepository.addToCurrentRun("Athlete " + cancelCmd.AthleteNum + " CANCEL\n");
-
-                if(!Race.COMPETITORS.containsKey(cancelCmd.AthleteNum))
-                    return;
-
-                Athlete a = Race.COMPETITORS.get(cancelCmd.AthleteNum);
-                _finished.remove(a);
-
-                a.discardRun(Race.RunNumber);
+                //NO Cancel
                 break;
             case SWAP:
                 //NO FUNCTION IN THIS RACE
                 break;
             case CLR:
-                //TODO IMPLEMENT IN FUTURE NOT NEEDED IN SPRINT 1
+                //No FUNCTION IN THIS RACE
                 break;
         }
     }
@@ -102,9 +86,11 @@ public class GrpRace extends Race {
     public void channelTriggered(int channelNum, LocalTime timeStamp) {
         if(channelNum == 1)
         {
-            //TODO addresss multiple TRIG CHannel 1
+            //addresss multiple TRIG CHannel 1
+            //ignores follow up triggers
+            if(_startTime != null)
+                return;
 
-                //TODO ignores follow up triggers
             _startTime = timeStamp;
 
             RunRepository.addToCurrentRun("GRP Race Start TRIG Channel 1\n");

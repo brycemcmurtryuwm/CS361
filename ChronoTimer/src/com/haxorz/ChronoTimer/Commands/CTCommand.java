@@ -205,8 +205,16 @@ public abstract class CTCommand {
 
                 return new PrintCmd(t, raceNum);
             case "clr":
-                //TODO IN THE FUTURE NOT NEEDED IN SPRINT 1
-                return null;
+                if(tmpArr.length < 2)
+                    return null;
+
+                try {
+                    racer = Integer.parseInt(tmpArr[1]);
+                }catch (Exception e){
+                    return null;
+                }
+
+                return new ClearCmd(t, racer);
             case "swap":
                 if(tmpArr.length < 2)
                     return new SwapCmd(t);
