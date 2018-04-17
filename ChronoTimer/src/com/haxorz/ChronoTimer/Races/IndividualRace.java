@@ -1,9 +1,6 @@
 package com.haxorz.ChronoTimer.Races;
 
-import com.haxorz.ChronoTimer.Commands.CTCommand;
-import com.haxorz.ChronoTimer.Commands.CancelCmd;
-import com.haxorz.ChronoTimer.Commands.CmdType;
-import com.haxorz.ChronoTimer.Commands.NumCmd;
+import com.haxorz.ChronoTimer.Commands.*;
 
 import java.time.LocalTime;
 import java.util.Collections;
@@ -36,7 +33,7 @@ public class IndividualRace extends Race {
                 Athlete athlete = _currentlyRacing.poll();
 
                 if(athlete != null){
-                    athlete.getTimeTracker(this.RunNumber).setDNF(true);
+                    athlete.getTimeTracker(Race.RunNumber).setDNF(true);
                     RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " DNF\n");
                     _finished.add(athlete);
                 }
@@ -46,15 +43,15 @@ public class IndividualRace extends Race {
                 _didNotStartYet.clear();
 
                 while ((athlete = _currentlyRacing.poll()) != null){
-                    athlete.getTimeTracker(this.RunNumber).setDNF(true);
+                    athlete.getTimeTracker(Race.RunNumber).setDNF(true);
                 }
                 _finished.clear();
-                RunRepository.EndCurrentRun(this.RunNumber);
+                RunRepository.EndCurrentRun(Race.RunNumber);
 
                 if(cmd.CMDType == CmdType.ENDRUN)
                     break;
 
-                this.RunNumber++;
+                Race.RunNumber++;
                 break;
             case NUM:
                 NumCmd numCmd = (NumCmd)cmd;
@@ -67,7 +64,7 @@ public class IndividualRace extends Race {
                     COMPETITORS.put(numCmd.Number, athlete);
                 }
 
-                athlete.registerForRace(this.RunNumber);
+                athlete.registerForRace(Race.RunNumber);
                 _didNotStartYet.add(athlete);
                 break;
             case CANCEL:
@@ -82,8 +79,8 @@ public class IndividualRace extends Race {
                 _didNotStartYet.remove(a);
                 _finished.remove(a);
 
-                a.discardRun(this.RunNumber);
-                a.registerForRace(this.RunNumber);
+                a.discardRun(Race.RunNumber);
+                a.registerForRace(Race.RunNumber);
                 ((LinkedList<Athlete>)_didNotStartYet).add(0,a);
                 break;
             case SWAP:
@@ -93,7 +90,14 @@ public class IndividualRace extends Race {
                 Collections.swap((LinkedList<Athlete>)_currentlyRacing,0,1);
                 break;
             case CLR:
-                //TODO IMPLEMENT IN FUTURE NOT NEEDED IN SPRINT 1
+                ClearCmd clrCmd = (ClearCmd) cmd;
+                RunRepository.addToCurrentRun("Athlete " + clrCmd.Num + " CLEAR\n");
+
+                if(!Race.COMPETITORS.containsKey(clrCmd.Num))
+                    return;
+
+                a = Race.COMPETITORS.get(clrCmd.Num);
+                _didNotStartYet.remove(a);
                 break;
         }
     }
@@ -106,7 +110,7 @@ public class IndividualRace extends Race {
             Athlete athlete = _didNotStartYet.poll();
 
             if(athlete != null){
-                athlete.getTimeTracker(this.RunNumber).setStartTime(timeStamp);
+                athlete.getTimeTracker(Race.RunNumber).setStartTime(timeStamp);
                 RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 1\n");
                 _currentlyRacing.add(athlete);
             }
@@ -117,9 +121,9 @@ public class IndividualRace extends Race {
             Athlete athlete = _currentlyRacing.poll();
 
             if(athlete != null){
-                athlete.getTimeTracker(this.RunNumber).setEndTime(timeStamp);
+                athlete.getTimeTracker(Race.RunNumber).setEndTime(timeStamp);
                 RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 2\n");
-                RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " ELAPSED " + athlete.getTimeTracker(this.RunNumber).toStringMinutes() + "\n");
+                RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " ELAPSED " + athlete.getTimeTracker(Race.RunNumber).toStringMinutes() + "\n");
                 _finished.add(athlete);
             }
             else
