@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -27,6 +28,8 @@ public class ChronoTimerUI extends JFrame implements Observer{
 	private JTextPane _printer;
 	private String _buffer = "";
 
+	private List<JComponent> _components = new ArrayList<>();
+
 	public ChronoTimerUI(){
 		this.setSize(1000,850);
 		this.setResizable(false);
@@ -36,6 +39,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		_timer.setRaceObserver(this);
 		setVisible(true);
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		setPoweredOn();
 	}
 
 	private void createComponents(){
@@ -51,7 +55,9 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		JPanel powerPanel = new JPanel();
 		JButton powerButton = new JButton("Power");
 		powerButton.setFont(font);
-		powerButton.addActionListener(e -> _timer.executeCmd(new GenericCmd(CmdType.POWER, LocalTime.now())));
+		powerButton.addActionListener(e -> {_timer.executeCmd(new GenericCmd(CmdType.POWER, LocalTime.now()));
+			setPoweredOn();
+		});
 		powerPanel.add(powerButton);
 		front.add(powerPanel);
 
@@ -140,6 +146,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		}
 		channelsPanel.add(sensorGrid);
 		front.add(channelsPanel);
+		_components.add(channelsPanel);
 
 		//printer
 		JPanel printerPanel = new JPanel();
@@ -153,6 +160,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		_printer.setMaximumSize(new Dimension(250,280));
 		printerPanel.add(printerScroll);
 		front.add(printerPanel);
+		_components.add(printerPanel);
 
 		//Function, arrows, and Swap
 		JPanel randomButtons = new JPanel();
@@ -191,6 +199,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		swapButton.setFont(font);
 		randomButtons.add(swapButton);
 		front.add(randomButtons);
+		_components.add(randomButtons);
 
 		//screenPanel
 		JPanel screenPanel = new JPanel();
@@ -205,6 +214,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		screenInfo.setFont(font);
 		screenPanel.add(screenInfo, BorderLayout.SOUTH);
 		front.add(screenPanel, BorderLayout.CENTER);
+		_components.add(screenPanel);
 
 		//numpanel
 		GridLayout numLayout = new GridLayout(4,3);
@@ -236,6 +246,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		JPanel numPanelCover = new JPanel(new FlowLayout());
 		numPanelCover.add(numPanel);
 		front.add(numPanelCover,BorderLayout.EAST);
+		_components.add(numPanelCover);
 		this.add(front, BorderLayout.CENTER);
 
 
@@ -246,6 +257,8 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		chanLabel.setBorder(new EmptyBorder(0,0,45,350));
 		chanLabel.setFont(font);
 		back.add(chanLabel);
+		_components.add(chanLabel);
+
 		GridLayout portsLayout = new GridLayout(4,4);
 		portsLayout.setHgap(15);
 		JPanel ports = new JPanel(portsLayout);
@@ -269,13 +282,36 @@ public class ChronoTimerUI extends JFrame implements Observer{
 			ports.add(box);
 		}
 		back.add(ports);
+		_components.add(ports);
+
 		try {
 			BufferedImage myPicture = ImageIO.read(new File("ChronoTimer/res/usbImage.jpg"));
 			JLabel picLabel = new JLabel(new ImageIcon(myPicture));
 			back.add(picLabel);
+			_components.add(picLabel);
 		}catch(IOException e){}
 		this.add(back, BorderLayout.SOUTH);
+	}
 
+	private void setPoweredOn() {
+		boolean isPoweredOn = _timer.isPoweredOn();
+
+		for(JComponent jC: _components){
+			setComponentsEnabled(jC, isPoweredOn);
+		}
+
+		_screen.setText(isPoweredOn ? "No Data To Display" : "");
+		_printer.setText("");
+	}
+
+	private void setComponentsEnabled(java.awt.Container c, boolean en) {
+		Component[] components = c.getComponents();
+		for (Component comp: components) {
+			if (comp instanceof java.awt.Container)
+				setComponentsEnabled((java.awt.Container) comp, en);
+			comp.setEnabled(en);
+		}
+		c.setEnabled(en);
 	}
 
 	@Override
@@ -325,7 +361,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 			_buffer += source.getText();
 		}
 	}
-	
+
 	public class connectSensorListener implements ActionListener{
 
 		@Override

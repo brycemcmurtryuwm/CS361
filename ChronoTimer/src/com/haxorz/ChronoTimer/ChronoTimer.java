@@ -180,9 +180,10 @@ public class ChronoTimer {
                     currentRace.executeCmd(cmd);
                 }
         }
+    }
 
-
-
+    public boolean isPoweredOn(){
+        return poweredOn;
     }
 
     private void setObservers() {
