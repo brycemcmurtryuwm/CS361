@@ -132,7 +132,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 			startButtons[i].setOpaque(true);
 			startButtons[i].setBackground(Color.RED);
 			int finalI = i;
-			startButtons[i].addActionListener(e -> _timer.executeCmd(new ToggleCmd(LocalTime.now(), finalI + 1)));
+			startButtons[i].addActionListener(e -> _timer.executeCmd(new TriggerCmd(LocalTime.now(), finalI + 1)));
 			sensorGrid.add(startButtons[i]);
 		}
 		sensorGrid.add(enableLabel2);
@@ -229,7 +229,8 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		}
 		_numPad[10] = new JButton("*");
 		_numPad[10].setFont(font2);
-		_numPad[10].addActionListener(new numPadListener());
+		//This has not purpose except to cause Parse Errors?
+		//_numPad[10].addActionListener(new numPadListener());
 		numPanel.add(_numPad[10]);
 		_numPad[0] = new JButton("0");
 		_numPad[0].setFont(font2);
@@ -376,6 +377,8 @@ public class ChronoTimerUI extends JFrame implements Observer{
 						null,
 						SensorType.values(),
 						SensorType.EYE);
+				if(s == null)
+					return;
 				_timer.executeCmd(new ConnectCmd(s,source.channel,LocalTime.now()));
 			}
 			else{
@@ -385,6 +388,8 @@ public class ChronoTimerUI extends JFrame implements Observer{
 	}
 
 	public static void main(String[] args){
+		
+
 		new ChronoTimerUI();
 	}
 }

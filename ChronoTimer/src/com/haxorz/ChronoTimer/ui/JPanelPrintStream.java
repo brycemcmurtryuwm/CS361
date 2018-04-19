@@ -15,9 +15,11 @@ public class JPanelPrintStream extends PrintStream
 	public void print(String s) {
 		super.print(s);
 		printScreen.setText(printScreen.getText()+s);
+		System.out.print(s);
 	}
 	@Override
 	public void println(String s) {
 		printScreen.setText(printScreen.getText()+ s + "\n");
+		System.out.println(s);
 	}
 }
