@@ -3,9 +3,7 @@ package com.haxorz.ChronoTimer.Races;
 import com.haxorz.ChronoTimer.Commands.*;
 
 import java.time.LocalTime;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 public class IndividualRace extends Race {
 
@@ -100,6 +98,21 @@ public class IndividualRace extends Race {
                 _didNotStartYet.remove(a);
                 break;
         }
+    }
+
+    @Override
+    protected List<Athlete> getCompletedAthletes() {
+        return new ArrayList<>(_finished);
+    }
+
+    @Override
+    protected List<Athlete> athletesRunning() {
+        return new ArrayList<>(_currentlyRacing);
+    }
+
+    @Override
+    protected List<Athlete> athletesInQueue() {
+        return new ArrayList<>(_didNotStartYet);
     }
 
 

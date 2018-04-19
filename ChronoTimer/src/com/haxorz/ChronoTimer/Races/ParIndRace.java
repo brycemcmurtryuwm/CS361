@@ -3,9 +3,7 @@ package com.haxorz.ChronoTimer.Races;
 import com.haxorz.ChronoTimer.Commands.*;
 
 import java.time.LocalTime;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 public class ParIndRace extends Race {
 
@@ -147,8 +145,27 @@ public class ParIndRace extends Race {
 		}
 	}
 
+    @Override
+    protected List<Athlete> getCompletedAthletes() {
+        return new ArrayList<>(_finished);
+    }
 
-	@Override
+    @Override
+    protected List<Athlete> athletesRunning() {
+        List<Athlete> toReturn = new ArrayList<>(_currentlyRacing1);
+        toReturn.addAll(_currentlyRacing2);
+        return toReturn;
+    }
+
+    @Override
+    protected List<Athlete> athletesInQueue() {
+        List<Athlete> toReturn = new ArrayList<>(_didNotStartYet1);
+        toReturn.addAll(_didNotStartYet2);
+        return toReturn;
+    }
+
+
+    @Override
 	public void channelTriggered(int channelNum, LocalTime timeStamp) {
 		if(channelNum == 1)
 		{

@@ -3,7 +3,9 @@ package com.haxorz.ChronoTimer.Races;
 import com.haxorz.ChronoTimer.Commands.*;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 public class GrpRace extends Race {
@@ -83,6 +85,23 @@ public class GrpRace extends Race {
                 //No FUNCTION IN THIS RACE
                 break;
         }
+    }
+
+    @Override
+    protected List<Athlete> getCompletedAthletes() {
+        List<Athlete> toReturn = new ArrayList<>(_finished);
+        toReturn.addAll(_runStore);
+        return toReturn;
+    }
+
+    @Override
+    protected List<Athlete> athletesRunning() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    protected List<Athlete> athletesInQueue() {
+        return new ArrayList<>();
     }
 
     private void updateRunRepository(){
