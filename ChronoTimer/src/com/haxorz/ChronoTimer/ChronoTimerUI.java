@@ -1,14 +1,10 @@
 package com.haxorz.ChronoTimer;
 
-import com.haxorz.ChronoTimer.Commands.CmdType;
-import com.haxorz.ChronoTimer.Commands.GenericCmd;
-import com.haxorz.ChronoTimer.Commands.ToggleCmd;
-import com.haxorz.ChronoTimer.Commands.TriggerCmd;
+import com.haxorz.ChronoTimer.Commands.*;
+import com.haxorz.ChronoTimer.Hardware.SensorType;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -16,7 +12,6 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.time.LocalTime;
 
@@ -24,12 +19,14 @@ public class ChronoTimerUI extends JFrame{
 	ChronoTimer _timer;
 	JButton[] _numPad = new JButton[12];
 	JTextPane _screen;
+	JTextPane _printer;
+	String _buffer = "";
 	public ChronoTimerUI(){
 		this.setSize(1000,850);
 		this.setResizable(false);
 		this.setTitle("ChronoTimer 1009");
 		createComponents();
-		_timer = new ChronoTimer(new JPanelPrintStream(_screen));
+		_timer = new ChronoTimer(new JPanelPrintStream(_printer));
 		setVisible(true);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 	}
@@ -73,7 +70,7 @@ public class ChronoTimerUI extends JFrame{
 		JPanel sensorGrid = new JPanel(sensorLayout);
 		sensorGrid.setBorder(new EmptyBorder(100,0,50,0));
 		JButton[] startButtons = new JButton[8];
-		JCheckBox[] enableBoxes = new JCheckBox[8];
+		NumberedBox[] enableBoxes = new NumberedBox[8];
 
 
 		sensorGrid.add(new JPanel());
@@ -104,13 +101,13 @@ public class ChronoTimerUI extends JFrame{
 			sensorGrid.add(startButtons[i]);
 		}
 		sensorGrid.add(enableLabel1);
-		for(int i = 0; i <= 7; i+=2) {
-			enableBoxes[i] = new JCheckBox();
-			int finalI = i;
+		for(int i = 0; i < 8; i+=2) {
+			enableBoxes[i] = new NumberedBox(i+1);
 			enableBoxes[i].addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					_timer.executeCmd(new ToggleCmd(LocalTime.now(), finalI + 1));
+					NumberedBox source = (NumberedBox)e.getSource();
+					_timer.executeCmd(new ToggleCmd(LocalTime.now(), source.channel));
 				}
 			});
 			sensorGrid.add(enableBoxes[i]);
@@ -143,14 +140,14 @@ public class ChronoTimerUI extends JFrame{
 			sensorGrid.add(startButtons[i]);
 		}
 		sensorGrid.add(enableLabel2);
-		for(int i = 1; i <= 7; i+=2) {
-			enableBoxes[i] = new JCheckBox();
+		for(int i = 1; i < 8; i+=2) {
+			enableBoxes[i] = new NumberedBox(i + 1);
 			sensorGrid.add(enableBoxes[i]);
-			int finalI = i;
 			enableBoxes[i].addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					_timer.executeCmd(new TriggerCmd(LocalTime.now(), finalI + 1));
+					NumberedBox source = (NumberedBox)e.getSource();
+					_timer.executeCmd(new ToggleCmd(LocalTime.now(), source.channel));
 				}
 			});
 		}
@@ -160,11 +157,14 @@ public class ChronoTimerUI extends JFrame{
 		//printer
 		JPanel printerPanel = new JPanel();
 		JButton printerPower = new JButton("Printer Pwr");
+		printerPower.addActionListener(e -> _timer.executeCmd());
 		printerPanel.add(printerPower);
-		JTextPane printer = new JTextPane();
-		printer.setPreferredSize(new Dimension(250,280));
-		printer.setMaximumSize(new Dimension(250,280));
-		printerPanel.add(printer);
+		_printer = new JTextPane();
+		_printer.setEditable(false);
+		JScrollPane printerScroll = new JScrollPane(_printer);
+		_printer.setPreferredSize(new Dimension(250,280));
+		_printer.setMaximumSize(new Dimension(250,280));
+		printerPanel.add(printerScroll);
 		front.add(printerPanel);
 
 		//Function, arrows, and Swap
@@ -199,6 +199,7 @@ public class ChronoTimerUI extends JFrame{
 
 
 		JButton swapButton= new JButton("Swap");
+		//swapButton.addActionListener(e -> _timer.executeCmd(new SwapCmd()));
 		swapButton.setFont(font);
 		randomButtons.add(swapButton);
 		front.add(randomButtons);
@@ -209,7 +210,8 @@ public class ChronoTimerUI extends JFrame{
 		_screen.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
 		_screen.setPreferredSize(new Dimension(250,280));
 		_screen.setMaximumSize(new Dimension(250,280));
-		screenPanel.add(_screen);
+		JScrollPane screenScroll = new JScrollPane(_screen);
+		screenPanel.add(screenScroll);
 		JLabel screenInfo = new JLabel("Queue/Running/Final Time");
 		screenInfo.setFont(font);
 		screenPanel.add(screenInfo, BorderLayout.SOUTH);
@@ -236,13 +238,23 @@ public class ChronoTimerUI extends JFrame{
 		numPanel.add(_numPad[0]);
 		_numPad[11] = new JButton("#");
 		_numPad[11].setFont(font2);
-		_numPad[11].addActionListener(new numPadListener());
+		_numPad[11].addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				_timer.executeCmd(new NumCmd(LocalTime.now(), Integer.parseInt(_buffer)));
+				_buffer = "";
+			}
+		});
+
 		numPanel.add(_numPad[11]);
 		JPanel numPanelCover = new JPanel(new FlowLayout());
 		numPanelCover.add(numPanel);
 		front.add(numPanelCover,BorderLayout.EAST);
 		this.add(front, BorderLayout.CENTER);
 
+
+
+		//the back
 		JPanel back = new JPanel();
 		JLabel chanLabel = new JLabel("CHAN");
 		chanLabel.setBorder(new EmptyBorder(0,0,45,350));
@@ -256,13 +268,20 @@ public class ChronoTimerUI extends JFrame{
 		ports.add(new JLabel("3"));
 		ports.add(new JLabel("5"));
 		ports.add(new JLabel("7"));
-		for(int i = 0; i < 4; i++) { ports.add(new JLabel("" + (char)9675)); }
+		for(int i = 0; i < 8; i+=2) {
+			NumberedBox box = new NumberedBox(i + 1);
+			box.addActionListener(new connectSensorListener());
+			ports.add(box);
+		}
 		ports.add(new JLabel("2"));
 		ports.add(new JLabel("4"));
 		ports.add(new JLabel("6"));
 		ports.add(new JLabel("8"));
-		for(int i = 0; i < 4; i++) { ports.add(new JLabel("" + (char)9675)); }
-
+		for(int i = 1; i < 8; i+=2) {
+			NumberedBox box = new NumberedBox(i + 1);
+			box.addActionListener(new connectSensorListener());
+			ports.add(box);
+		}
 		back.add(ports);
 		try {
 			BufferedImage myPicture = ImageIO.read(new File("ChronoTimer/res/usbImage.jpg"));
@@ -276,7 +295,36 @@ public class ChronoTimerUI extends JFrame{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			JButton source = (JButton)e.getSource();
+			_buffer += source.getText();
+		}
+	}
+	public class connectSensorListener implements ActionListener{
 
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			NumberedBox source = (NumberedBox)e.getSource();
+			if(source.isSelected()){
+				SensorType s = (SensorType) JOptionPane.showInputDialog(
+						new JFrame(),
+						"Select Sensor Type",
+						"A Choice",
+						JOptionPane.PLAIN_MESSAGE,
+						null,
+						SensorType.values(),
+						SensorType.EYE);
+				_timer.executeCmd(new ConnectCmd(s,source.channel,LocalTime.now()));
+			}
+			else{
+				_timer.executeCmd(new DisconnectCmd(LocalTime.now(),source.channel));
+			}
+		}
+	}
+	public class NumberedBox extends JCheckBox{
+		int channel;
+		public NumberedBox(int channel){
+			super();
+			this.channel = channel;
 		}
 	}
 	public class JPanelPrintStream extends PrintStream
@@ -297,6 +345,7 @@ public class ChronoTimerUI extends JFrame{
 			printScreen.setText(printScreen.getText()+ s + "\n");
 		}
 	}
+
 	public static void main(String[] args){
 		new ChronoTimerUI();
 	}
