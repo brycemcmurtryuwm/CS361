@@ -41,7 +41,10 @@ public class GrpRace extends Race {
                 _athleteNum = 0;
 
                 if(cmd.CMDType == CmdType.ENDRUN)
+                {
+                    updateRunRepository();
                     break;
+                }
 
                 Race.RunNumber++;
                 break;
@@ -65,6 +68,7 @@ public class GrpRace extends Race {
                     if(temp != null){
                         athlete.getTimeTracker(Race.RunNumber).setEndTime(temp.getTimeTracker(Race.RunNumber).getEndTime());
                         _finished.add(athlete);
+                        updateRunRepository();
                     }
 
                 }
@@ -78,6 +82,20 @@ public class GrpRace extends Race {
             case CLR:
                 //No FUNCTION IN THIS RACE
                 break;
+        }
+    }
+
+    private void updateRunRepository(){
+        RunRepository.clearCurrentRun();
+
+        for(Athlete a : _finished){
+            RunRepository.addToCurrentRun("Athlete " + a.getNumber() + " TRIG Channel 2\n");
+            RunRepository.addToCurrentRun("Athlete " + a.getNumber() + " ELAPSED " + a.getTimeTracker(Race.RunNumber).toStringMinutes() + "\n");
+        }
+
+        for(Athlete a : _runStore){
+            RunRepository.addToCurrentRun("Athlete " + a.getNumber() + " TRIG Channel 2\n");
+            RunRepository.addToCurrentRun("Athlete " + a.getNumber() + " ELAPSED " + a.getTimeTracker(Race.RunNumber).toStringMinutes() + "\n");
         }
     }
 
@@ -99,6 +117,7 @@ public class GrpRace extends Race {
             Athlete athlete = new Athlete(++_athleteNum);
 
             if(_startTime != null){
+                athlete.registerForRace(Race.RunNumber);
                 athlete.getTimeTracker(Race.RunNumber).setStartTime(_startTime);
                 athlete.getTimeTracker(Race.RunNumber).setEndTime(timeStamp);
                 RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 2\n");

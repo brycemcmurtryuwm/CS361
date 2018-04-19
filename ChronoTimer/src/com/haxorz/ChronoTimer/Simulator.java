@@ -61,7 +61,7 @@ public class Simulator {
             bufferedReader.close();
         }
         catch (Exception e){
-
+            System.out.println(e.getMessage());
         }
     }
 
