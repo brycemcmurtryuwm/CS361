@@ -5,18 +5,19 @@ import com.haxorz.ChronoTimer.Hardware.Channel;
 import com.haxorz.ChronoTimer.Hardware.Export;
 import com.haxorz.ChronoTimer.Hardware.InputSensor;
 import com.haxorz.ChronoTimer.Hardware.Printer;
-import com.haxorz.ChronoTimer.Races.IndividualRace;
-import com.haxorz.ChronoTimer.Races.ParIndRace;
-import com.haxorz.ChronoTimer.Races.Race;
-import com.haxorz.ChronoTimer.Races.RunRepository;
+import com.haxorz.ChronoTimer.Races.*;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observer;
 
 public class ChronoTimer {
 
     private boolean poweredOn = false;
 
     private Race currentRace = new IndividualRace();
+    private List<Observer> observers = new ArrayList<>();
 
     private Channel[] channels = new Channel[12];
     private InputSensor[] sensors = new InputSensor[12];
@@ -30,6 +31,12 @@ public class ChronoTimer {
 
         printer = new Printer(out);
         Channel.ChannelListener = currentRace;
+    }
+
+    public void setRaceObserver(Observer o){
+        currentRace.addObserver(o);
+
+        observers.add(o);
     }
 
     private void reset() {
@@ -47,7 +54,6 @@ public class ChronoTimer {
     }
 
     public void executeCmd(CTCommand cmd){
-        printer.log(cmd);
 
         if(cmd.CMDType == CmdType.POWER){
             poweredOn = !poweredOn;
@@ -60,9 +66,12 @@ public class ChronoTimer {
             return;
         }
 
+        printer.log(cmd);
+
         switch (cmd.CMDType){
             case EVENT:
                 EventCmd race = (EventCmd)cmd;
+                currentRace.deleteObservers();
 
                 switch (race.RaceType){
                     case IND:
@@ -72,13 +81,14 @@ public class ChronoTimer {
                         currentRace = new ParIndRace();
                         break;
                     case GRP:
-                        //TODO IN THE FUTURE NOT NEEDED IN SPRINT 1
+                        currentRace = new GrpRace();
                         break;
                     case PARGRP:
                         //TODO IN THE FUTURE NOT NEEDED IN SPRINT 1
                         break;
                 }
 
+                setObservers();
                 Channel.ChannelListener = currentRace;
                 return;
             case EXIT:
@@ -91,13 +101,16 @@ public class ChronoTimer {
                 ExportCmd exportCmd = (ExportCmd)cmd;
 
                 if(exportCmd.UseCurrentRun){
-                    Export.SaveRunToFile(currentRace.RunNumber);
+                    Export.SaveRunToFile(Race.RunNumber);
                     return;
                 }
 
                 if(!RunRepository.CompletedRuns.containsKey(exportCmd.RaceNumber))
                     return;
                 Export.SaveRunToFile(exportCmd.RaceNumber);
+                break;
+            case PRINTPWR:
+                printer.PowerPushed(cmd.TimeStamp);
                 break;
             case PRINT:
                 PrintCmd printCmd = (PrintCmd)cmd;
@@ -167,9 +180,16 @@ public class ChronoTimer {
                     currentRace.executeCmd(cmd);
                 }
         }
+    }
 
+    public boolean isPoweredOn(){
+        return poweredOn;
+    }
 
-
+    private void setObservers() {
+        for(Observer o: observers){
+            currentRace.addObserver(o);
+        }
     }
 
 

@@ -81,4 +81,7 @@ public class RunRepository {
         return toReturn;
     }
 
+    public static void clearCurrentRun() {
+        currentRun = "";
+    }
 }

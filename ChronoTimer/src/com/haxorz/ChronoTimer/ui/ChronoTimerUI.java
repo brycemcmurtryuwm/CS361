@@ -1,7 +1,9 @@
-package com.haxorz.ChronoTimer;
+package com.haxorz.ChronoTimer.ui;
 
+import com.haxorz.ChronoTimer.ChronoTimer;
 import com.haxorz.ChronoTimer.Commands.*;
 import com.haxorz.ChronoTimer.Hardware.SensorType;
+import com.haxorz.ChronoTimer.Races.Race;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -14,23 +16,33 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
-public class ChronoTimerUI extends JFrame{
-	ChronoTimer _timer;
-	JButton[] _numPad = new JButton[12];
-	JTextPane _screen;
-	JTextPane _printer;
-	String _buffer = "";
+public class ChronoTimerUI extends JFrame implements Observer{
+	private ChronoTimer _timer;
+	private JButton[] _numPad = new JButton[12];
+	private JTextPane _screen;
+	private JTextPane _printer;
+	private String _buffer = "";
+
+	private List<JComponent> _components = new ArrayList<>();
+
 	public ChronoTimerUI(){
 		this.setSize(1000,850);
 		this.setResizable(false);
 		this.setTitle("ChronoTimer 1009");
 		createComponents();
 		_timer = new ChronoTimer(new JPanelPrintStream(_printer));
+		_timer.setRaceObserver(this);
 		setVisible(true);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		setPoweredOn();
 	}
-	public void createComponents(){
+
+	private void createComponents(){
 		JPanel front = new JPanel(new GridLayout(2,3));
 
 		Font font = new Font("SansSerif", Font.PLAIN, 20);
@@ -43,11 +55,8 @@ public class ChronoTimerUI extends JFrame{
 		JPanel powerPanel = new JPanel();
 		JButton powerButton = new JButton("Power");
 		powerButton.setFont(font);
-		powerButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				_timer.executeCmd(new GenericCmd(CmdType.POWER, LocalTime.now()));
-			}
+		powerButton.addActionListener(e -> {_timer.executeCmd(new GenericCmd(CmdType.POWER, LocalTime.now()));
+			setPoweredOn();
 		});
 		powerPanel.add(powerButton);
 		front.add(powerPanel);
@@ -92,24 +101,16 @@ public class ChronoTimerUI extends JFrame{
 			startButtons[i].setOpaque(true);
 			startButtons[i].setBackground(Color.RED);
 			int finalI = i;
-			startButtons[i].addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					_timer.executeCmd(new TriggerCmd(LocalTime.now(), finalI + 1));
-				}
-			});
+			startButtons[i].addActionListener(e -> _timer.executeCmd(new TriggerCmd(LocalTime.now(), finalI + 1)));
 			sensorGrid.add(startButtons[i]);
 		}
 		sensorGrid.add(enableLabel1);
 		for(int i = 0; i < 8; i+=2) {
 			enableBoxes[i] = new NumberedBox(i+1);
-			enableBoxes[i].addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					NumberedBox source = (NumberedBox)e.getSource();
-					_timer.executeCmd(new ToggleCmd(LocalTime.now(), source.channel));
-				}
-			});
+			enableBoxes[i].addActionListener(e -> {
+                NumberedBox source = (NumberedBox)e.getSource();
+                _timer.executeCmd(new ToggleCmd(LocalTime.now(), source.channel));
+            });
 			sensorGrid.add(enableBoxes[i]);
 		}
 		sensorGrid.add(new JPanel());
@@ -131,33 +132,26 @@ public class ChronoTimerUI extends JFrame{
 			startButtons[i].setOpaque(true);
 			startButtons[i].setBackground(Color.RED);
 			int finalI = i;
-			startButtons[i].addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					_timer.executeCmd(new ToggleCmd(LocalTime.now(), finalI + 1));
-				}
-			});
+			startButtons[i].addActionListener(e -> _timer.executeCmd(new TriggerCmd(LocalTime.now(), finalI + 1)));
 			sensorGrid.add(startButtons[i]);
 		}
 		sensorGrid.add(enableLabel2);
 		for(int i = 1; i < 8; i+=2) {
 			enableBoxes[i] = new NumberedBox(i + 1);
 			sensorGrid.add(enableBoxes[i]);
-			enableBoxes[i].addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					NumberedBox source = (NumberedBox)e.getSource();
-					_timer.executeCmd(new ToggleCmd(LocalTime.now(), source.channel));
-				}
-			});
+			enableBoxes[i].addActionListener(e -> {
+                NumberedBox source = (NumberedBox)e.getSource();
+                _timer.executeCmd(new ToggleCmd(LocalTime.now(), source.channel));
+            });
 		}
 		channelsPanel.add(sensorGrid);
 		front.add(channelsPanel);
+		_components.add(channelsPanel);
 
 		//printer
 		JPanel printerPanel = new JPanel();
 		JButton printerPower = new JButton("Printer Pwr");
-		printerPower.addActionListener(e -> _timer.executeCmd());
+		printerPower.addActionListener(e -> _timer.executeCmd(new GenericCmd(CmdType.PRINTPWR, LocalTime.now())));
 		printerPanel.add(printerPower);
 		_printer = new JTextPane();
 		_printer.setEditable(false);
@@ -166,6 +160,7 @@ public class ChronoTimerUI extends JFrame{
 		_printer.setMaximumSize(new Dimension(250,280));
 		printerPanel.add(printerScroll);
 		front.add(printerPanel);
+		_components.add(printerPanel);
 
 		//Function, arrows, and Swap
 		JPanel randomButtons = new JPanel();
@@ -199,10 +194,12 @@ public class ChronoTimerUI extends JFrame{
 
 
 		JButton swapButton= new JButton("Swap");
-		//swapButton.addActionListener(e -> _timer.executeCmd(new SwapCmd()));
+		//TODO Test
+		swapButton.addActionListener(e -> _timer.executeCmd(new SwapCmd(LocalTime.now())));
 		swapButton.setFont(font);
 		randomButtons.add(swapButton);
 		front.add(randomButtons);
+		_components.add(randomButtons);
 
 		//screenPanel
 		JPanel screenPanel = new JPanel();
@@ -210,12 +207,14 @@ public class ChronoTimerUI extends JFrame{
 		_screen.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
 		_screen.setPreferredSize(new Dimension(250,280));
 		_screen.setMaximumSize(new Dimension(250,280));
+		_screen.setText("No Data To Display");
 		JScrollPane screenScroll = new JScrollPane(_screen);
 		screenPanel.add(screenScroll);
 		JLabel screenInfo = new JLabel("Queue/Running/Final Time");
 		screenInfo.setFont(font);
 		screenPanel.add(screenInfo, BorderLayout.SOUTH);
 		front.add(screenPanel, BorderLayout.CENTER);
+		_components.add(screenPanel);
 
 		//numpanel
 		GridLayout numLayout = new GridLayout(4,3);
@@ -230,7 +229,8 @@ public class ChronoTimerUI extends JFrame{
 		}
 		_numPad[10] = new JButton("*");
 		_numPad[10].setFont(font2);
-		_numPad[10].addActionListener(new numPadListener());
+		//This has not purpose except to cause Parse Errors?
+		//_numPad[10].addActionListener(new numPadListener());
 		numPanel.add(_numPad[10]);
 		_numPad[0] = new JButton("0");
 		_numPad[0].setFont(font2);
@@ -238,18 +238,16 @@ public class ChronoTimerUI extends JFrame{
 		numPanel.add(_numPad[0]);
 		_numPad[11] = new JButton("#");
 		_numPad[11].setFont(font2);
-		_numPad[11].addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				_timer.executeCmd(new NumCmd(LocalTime.now(), Integer.parseInt(_buffer)));
-				_buffer = "";
-			}
-		});
+		_numPad[11].addActionListener(e -> {
+            _timer.executeCmd(new NumCmd(LocalTime.now(), Integer.parseInt(_buffer)));
+            _buffer = "";
+        });
 
 		numPanel.add(_numPad[11]);
 		JPanel numPanelCover = new JPanel(new FlowLayout());
 		numPanelCover.add(numPanel);
 		front.add(numPanelCover,BorderLayout.EAST);
+		_components.add(numPanelCover);
 		this.add(front, BorderLayout.CENTER);
 
 
@@ -260,6 +258,8 @@ public class ChronoTimerUI extends JFrame{
 		chanLabel.setBorder(new EmptyBorder(0,0,45,350));
 		chanLabel.setFont(font);
 		back.add(chanLabel);
+		_components.add(chanLabel);
+
 		GridLayout portsLayout = new GridLayout(4,4);
 		portsLayout.setHgap(15);
 		JPanel ports = new JPanel(portsLayout);
@@ -283,14 +283,77 @@ public class ChronoTimerUI extends JFrame{
 			ports.add(box);
 		}
 		back.add(ports);
+		_components.add(ports);
+
 		try {
 			BufferedImage myPicture = ImageIO.read(new File("ChronoTimer/res/usbImage.jpg"));
 			JLabel picLabel = new JLabel(new ImageIcon(myPicture));
 			back.add(picLabel);
+			_components.add(picLabel);
 		}catch(IOException e){}
 		this.add(back, BorderLayout.SOUTH);
-
 	}
+
+	private void setPoweredOn() {
+		boolean isPoweredOn = _timer.isPoweredOn();
+
+		for(JComponent jC: _components){
+			setComponentsEnabled(jC, isPoweredOn);
+		}
+
+		_screen.setText(isPoweredOn ? "No Data To Display" : "");
+		_printer.setText("");
+	}
+
+	private void setComponentsEnabled(java.awt.Container c, boolean en) {
+		Component[] components = c.getComponents();
+		for (Component comp: components) {
+			if (comp instanceof java.awt.Container)
+				setComponentsEnabled((java.awt.Container) comp, en);
+			comp.setEnabled(en);
+		}
+		c.setEnabled(en);
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		if(o instanceof Race){
+			StringBuilder sb = new StringBuilder();
+
+			List<String> finalists = ((Race) o).getCompletedTimes();
+			List<String> running = ((Race) o).getAthletesRunning();
+			List<String> inQueue = ((Race) o).getAthletesInQueue();
+
+			if(finalists.size()>0){
+				sb.append("Final Times: \n");
+				for (String s: finalists){
+					sb.append(s).append("\n");
+				}
+			}
+
+			if(running.size()>0){
+				sb.append("Currently Running: \n");
+				for (String s: running){
+					sb.append(s).append("\n");
+				}
+			}
+
+			if(inQueue.size()>0){
+				sb.append("In Queue: \n");
+				for (String s: inQueue){
+					sb.append(s).append("\n");
+				}
+			}
+
+			if(inQueue.size()+running.size()+finalists.size() == 0){
+				_screen.setText("No Data To Display");
+				return;
+			}
+			_screen.setText(sb.toString());
+		}
+	}
+
+
 	public class numPadListener implements ActionListener{
 
 		@Override
@@ -299,6 +362,7 @@ public class ChronoTimerUI extends JFrame{
 			_buffer += source.getText();
 		}
 	}
+
 	public class connectSensorListener implements ActionListener{
 
 		@Override
@@ -313,6 +377,8 @@ public class ChronoTimerUI extends JFrame{
 						null,
 						SensorType.values(),
 						SensorType.EYE);
+				if(s == null)
+					return;
 				_timer.executeCmd(new ConnectCmd(s,source.channel,LocalTime.now()));
 			}
 			else{
@@ -320,35 +386,15 @@ public class ChronoTimerUI extends JFrame{
 			}
 		}
 	}
-	public class NumberedBox extends JCheckBox{
-		int channel;
-		public NumberedBox(int channel){
-			super();
-			this.channel = channel;
-		}
-	}
-	public class JPanelPrintStream extends PrintStream
-	{
-		JTextPane printScreen;
-
-		public JPanelPrintStream(JTextPane printScreen) {
-			super(System.out,true);
-			this.printScreen = printScreen;
-		}
-		@Override
-		public void print(String s) {
-			super.print(s);
-			printScreen.setText(printScreen.getText()+s);
-		}
-		@Override
-		public void println(String s) {
-			printScreen.setText(printScreen.getText()+ s + "\n");
-		}
-	}
 
 	public static void main(String[] args){
+		
+
 		new ChronoTimerUI();
 	}
 }
+
+
+
 
 

@@ -3,9 +3,7 @@ package com.haxorz.ChronoTimer.Races;
 import com.haxorz.ChronoTimer.Commands.*;
 
 import java.time.LocalTime;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 public class ParIndRace extends Race {
 
@@ -13,13 +11,15 @@ public class ParIndRace extends Race {
 	private Queue<Athlete> _currentlyRacing2;
 
 	private Queue<Athlete> _finished;
-	private Queue<Athlete> _didNotStartYet;
+	private Queue<Athlete> _didNotStartYet1;
+	private Queue<Athlete> _didNotStartYet2;
 
 	public ParIndRace() {
 		_currentlyRacing1 = new LinkedList<>();
 		_currentlyRacing2 = new LinkedList<>();
 		_finished = new LinkedList<>();
-		_didNotStartYet = new LinkedList<>();
+		_didNotStartYet1 = new LinkedList<>();
+		_didNotStartYet2 = new LinkedList<>();
 	}
 
 	@Override
@@ -49,28 +49,29 @@ public class ParIndRace extends Race {
 				Athlete athlete = dnfcmd.getLane() == 1?_currentlyRacing1.poll(): _currentlyRacing2.poll();
 
 				if(athlete != null){
-					athlete.getTimeTracker(this.RunNumber).setDNF(true);
+					athlete.getTimeTracker(Race.RunNumber).setDNF(true);
 					RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " DNF\n");
 					_finished.add(athlete);
 				}
 				break;
 			case NEWRUN:
 			case ENDRUN:
-				_didNotStartYet.clear();
+				_didNotStartYet1.clear();
+				_didNotStartYet2.clear();
 
 				while ((athlete = _currentlyRacing1.poll()) != null){
-					athlete.getTimeTracker(this.RunNumber).setDNF(true);
+					athlete.getTimeTracker(Race.RunNumber).setDNF(true);
 				}
 				while ((athlete = _currentlyRacing2.poll()) != null){
-					athlete.getTimeTracker(this.RunNumber).setDNF(true);
+					athlete.getTimeTracker(Race.RunNumber).setDNF(true);
 				}
 				_finished.clear();
-				RunRepository.EndCurrentRun(this.RunNumber);
+				RunRepository.EndCurrentRun(Race.RunNumber);
 
 				if(cmd.CMDType == CmdType.ENDRUN)
 					break;
 
-				this.RunNumber++;
+				Race.RunNumber++;
 				break;
 			case NUM:
 				NumCmd numCmd = (NumCmd)cmd;
@@ -83,8 +84,13 @@ public class ParIndRace extends Race {
 					COMPETITORS.put(numCmd.Number, athlete);
 				}
 
-				athlete.registerForRace(this.RunNumber);
-				_didNotStartYet.add(athlete);
+				athlete.registerForRace(Race.RunNumber);
+
+				if (_didNotStartYet2.size() < _didNotStartYet1.size()) {
+					_didNotStartYet2.add(athlete);
+				} else {
+					_didNotStartYet1.add(athlete);
+				}
 				break;
 			case CANCEL:
 				CancelCmd cancelCmd = (CancelCmd) cmd;
@@ -97,12 +103,18 @@ public class ParIndRace extends Race {
 
 				_currentlyRacing1.remove(a);
 				_currentlyRacing2.remove(a);
-				_didNotStartYet.remove(a);
+				_didNotStartYet1.remove(a);
+				_didNotStartYet2.remove(a);
 				_finished.remove(a);
 
-				a.discardRun(this.RunNumber);
-				a.registerForRace(this.RunNumber);
-				((LinkedList<Athlete>)_didNotStartYet).add(0,a);
+				a.discardRun(Race.RunNumber);
+				a.registerForRace(Race.RunNumber);
+
+				if (_didNotStartYet2.size() < _didNotStartYet1.size()) {
+					((LinkedList<Athlete>)_didNotStartYet2).add(0,a);
+				} else {
+					((LinkedList<Athlete>)_didNotStartYet1).add(0,a);
+				}
 				break;
 			case SWAP:
 				SwapCmd swap = (SwapCmd)cmd;
@@ -120,20 +132,47 @@ public class ParIndRace extends Race {
 				}
 				break;
 			case CLR:
-				//TODO IMPLEMENT IN FUTURE NOT NEEDED IN SPRINT 1
+				ClearCmd clrCmd = (ClearCmd) cmd;
+				RunRepository.addToCurrentRun("Athlete " + clrCmd.Num + " CLEAR\n");
+
+				if(!Race.COMPETITORS.containsKey(clrCmd.Num))
+					return;
+
+				a = Race.COMPETITORS.get(clrCmd.Num);
+				_didNotStartYet1.remove(a);
+				_didNotStartYet2.remove(a);
 				break;
 		}
 	}
 
+    @Override
+    protected List<Athlete> getCompletedAthletes() {
+        return new ArrayList<>(_finished);
+    }
 
-	@Override
+    @Override
+    protected List<Athlete> athletesRunning() {
+        List<Athlete> toReturn = new ArrayList<>(_currentlyRacing1);
+        toReturn.addAll(_currentlyRacing2);
+        return toReturn;
+    }
+
+    @Override
+    protected List<Athlete> athletesInQueue() {
+        List<Athlete> toReturn = new ArrayList<>(_didNotStartYet1);
+        toReturn.addAll(_didNotStartYet2);
+        return toReturn;
+    }
+
+
+    @Override
 	public void channelTriggered(int channelNum, LocalTime timeStamp) {
 		if(channelNum == 1)
 		{
-			Athlete athlete = _didNotStartYet.poll();
+			Athlete athlete = _didNotStartYet1.poll();
 
 			if(athlete != null){
-				athlete.getTimeTracker(this.RunNumber).setStartTime(timeStamp);
+				athlete.getTimeTracker(Race.RunNumber).setStartTime(timeStamp);
 				RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 1\n");
 				_currentlyRacing1.add(athlete);
 			}
@@ -144,9 +183,9 @@ public class ParIndRace extends Race {
 			Athlete athlete = _currentlyRacing1.poll();
 
 			if(athlete != null){
-				athlete.getTimeTracker(this.RunNumber).setEndTime(timeStamp);
+				athlete.getTimeTracker(Race.RunNumber).setEndTime(timeStamp);
 				RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 2\n");
-				RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " ELAPSED " + athlete.getTimeTracker(this.RunNumber).toStringMinutes() + "\n");
+				RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " ELAPSED " + athlete.getTimeTracker(Race.RunNumber).toStringMinutes() + "\n");
 				_finished.add(athlete);
 			}
 			else
@@ -155,10 +194,10 @@ public class ParIndRace extends Race {
 		}
 		if(channelNum == 3)
 		{
-			Athlete athlete = _didNotStartYet.poll();
+			Athlete athlete = _didNotStartYet2.poll();
 
 			if(athlete != null){
-				athlete.getTimeTracker(this.RunNumber).setStartTime(timeStamp);
+				athlete.getTimeTracker(Race.RunNumber).setStartTime(timeStamp);
 				RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 3\n");
 				_currentlyRacing2.add(athlete);
 			}
@@ -169,9 +208,9 @@ public class ParIndRace extends Race {
 			Athlete athlete = _currentlyRacing2.poll();
 
 			if(athlete != null){
-				athlete.getTimeTracker(this.RunNumber).setEndTime(timeStamp);
+				athlete.getTimeTracker(Race.RunNumber).setEndTime(timeStamp);
 				RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 4\n");
-				RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " ELAPSED " + athlete.getTimeTracker(this.RunNumber).toStringMinutes() + "\n");
+				RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " ELAPSED " + athlete.getTimeTracker(Race.RunNumber).toStringMinutes() + "\n");
 				_finished.add(athlete);
 			}
 			else
