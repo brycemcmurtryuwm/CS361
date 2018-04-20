@@ -166,12 +166,13 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		//Function, arrows, and Swap
 		JPanel randomButtons = new JPanel();
 		randomButtons.setBorder(new EmptyBorder(0,50,0,50));
-		/*
-		//as it is now the function and arrows have no purpose
+
 		JButton functionButton = new JButton("Function");
 		functionButton.setFont(font);
+		functionButton.addActionListener(new FunctionListener());
 		functionButton.setAlignmentX(2);
 		randomButtons.add(functionButton);
+		/* the arrows don't do anything right now
 		JPanel arrows = new JPanel();
 		JButton leftButton = new JButton(""+(char)9668);
 		leftButton.setFont(font);
@@ -388,6 +389,31 @@ public class ChronoTimerUI extends JFrame implements Observer{
 					RaceType.IND);
 			if(newRace != null)
 			    _timer.executeCmd(new EventCmd(LocalTime.now(), newRace));
+		}
+	}
+	public class FunctionListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			CmdType[] fuctions = {CmdType.CANCEL, CmdType.ENDRUN, CmdType.EXPORT, CmdType.NEWRUN};
+			CmdType command = (CmdType) JOptionPane.showInputDialog(
+					new JFrame(),
+					"Select Command",
+					"A Choice",
+					JOptionPane.PLAIN_MESSAGE,
+					null,
+					fuctions,
+					CmdType.CANCEL);
+			if(command == CmdType.CANCEL){
+				new CancelCmd(LocalTime.now(), Integer.parseInt(_buffer));
+				_buffer = "";
+				return;
+			}
+			if(command == CmdType.EXPORT){
+				new ExportCmd(LocalTime.now());
+				return;
+			}
+			_timer.executeCmd(new GenericCmd(command, LocalTime.now()));
 		}
 	}
 
