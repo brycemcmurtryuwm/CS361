@@ -43,6 +43,7 @@ public class ChronoTimer {
         Race.COMPETITORS.clear();
         Race.RunNumber = 0;
         RunRepository.clear();
+        currentRace.deleteObservers();
         currentRace = new IndividualRace();
         sensors = new InputSensor[12];
 
@@ -50,6 +51,7 @@ public class ChronoTimer {
             channels[i] = new Channel(i+1);
         }
 
+        setObservers();
         Channel.ChannelListener = currentRace;
     }
 

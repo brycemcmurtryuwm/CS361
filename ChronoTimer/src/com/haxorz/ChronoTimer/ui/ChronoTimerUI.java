@@ -2,9 +2,7 @@ package com.haxorz.ChronoTimer.ui;
 
 import com.haxorz.ChronoTimer.ChronoTimer;
 import com.haxorz.ChronoTimer.Commands.*;
-import com.haxorz.ChronoTimer.Hardware.SensorType;
 import com.haxorz.ChronoTimer.Races.Race;
-import com.haxorz.ChronoTimer.Races.RaceType;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -19,6 +17,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.List;
+import java.util.Queue;
 
 public class ChronoTimerUI extends JFrame implements Observer{
 	private ChronoTimer _timer;
@@ -28,7 +27,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 	private String _buffer = "";
 
 	private List<JComponent> _components = new ArrayList<>();
-    private NumberedBox[] _enableBoxes;
+    private List<NumberedBox> _numberedBoxes = new ArrayList<>();
 
     private NumPadState _numPadState = NumPadState.NumCmd;
     private String _previousText = "";
@@ -82,7 +81,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		JPanel sensorGrid = new JPanel(sensorLayout);
 		sensorGrid.setBorder(new EmptyBorder(100,0,50,0));
 		JButton[] startButtons = new JButton[8];
-		_enableBoxes = new NumberedBox[8];
+		NumberedBox[] enableBoxes = new NumberedBox[8];
 
 
 		sensorGrid.add(new JPanel());
@@ -109,12 +108,12 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		}
 		sensorGrid.add(enableLabel1);
 		for(int i = 0; i < 8; i+=2) {
-			_enableBoxes[i] = new NumberedBox(i+1);
-			_enableBoxes[i].addActionListener(e -> {
+			enableBoxes[i] = new NumberedBox(i+1);
+			enableBoxes[i].addActionListener(e -> {
                 NumberedBox source = (NumberedBox)e.getSource();
                 _timer.executeCmd(new ToggleCmd(LocalTime.now(), source.channel));
             });
-			sensorGrid.add(_enableBoxes[i]);
+			sensorGrid.add(enableBoxes[i]);
 		}
 		sensorGrid.add(new JPanel());
 		JLabel two = new JLabel("2");
@@ -140,9 +139,9 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		}
 		sensorGrid.add(enableLabel2);
 		for(int i = 1; i < 8; i+=2) {
-			_enableBoxes[i] = new NumberedBox(i + 1);
-			sensorGrid.add(_enableBoxes[i]);
-			_enableBoxes[i].addActionListener(e -> {
+			enableBoxes[i] = new NumberedBox(i + 1);
+			sensorGrid.add(enableBoxes[i]);
+			enableBoxes[i].addActionListener(e -> {
                 NumberedBox source = (NumberedBox)e.getSource();
                 _timer.executeCmd(new ToggleCmd(LocalTime.now(), source.channel));
             });
@@ -150,6 +149,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		channelsPanel.add(sensorGrid);
 		front.add(channelsPanel);
 		_components.add(channelsPanel);
+		Collections.addAll(_numberedBoxes, enableBoxes);
 
 		//printer
 		JPanel printerPanel = new JPanel();
@@ -191,7 +191,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		randomButtons.add(arrows);*/
 		JButton newRaceButton = new JButton("Create Race");
 		newRaceButton.setFont(font);
-		newRaceButton.addActionListener(new NewRaceListener());
+		newRaceButton.addActionListener(new NewRaceListener(_timer));
 		randomButtons.add(newRaceButton);
 
 		randomButtons.add(new JLabel("                                                    "));	//filler
@@ -204,7 +204,6 @@ public class ChronoTimerUI extends JFrame implements Observer{
 
 
 		JButton swapButton= new JButton("Swap");
-		//TODO Test
 		swapButton.addActionListener(e -> _timer.executeCmd(new SwapCmd(LocalTime.now())));
 		swapButton.setFont(font);
 		randomButtons.add(swapButton);
@@ -348,8 +347,9 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		ports.add(new JLabel("7"));
 		for(int i = 0; i < 8; i+=2) {
 			NumberedBox box = new NumberedBox(i + 1);
-			box.addActionListener(new connectSensorListener());
+			box.addActionListener(new ConnectSensorListener(_timer));
 			ports.add(box);
+			_numberedBoxes.add(box);
 		}
 		ports.add(new JLabel("2"));
 		ports.add(new JLabel("4"));
@@ -357,8 +357,9 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		ports.add(new JLabel("8"));
 		for(int i = 1; i < 8; i+=2) {
 			NumberedBox box = new NumberedBox(i + 1);
-			box.addActionListener(new connectSensorListener());
+			box.addActionListener(new ConnectSensorListener(_timer));
 			ports.add(box);
+			_numberedBoxes.add(box);
 		}
 		back.add(ports);
 		_components.add(ports);
@@ -381,7 +382,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 
 		_screen.setText(isPoweredOn ? "No Data To Display" : "");
 
-		for(NumberedBox box: _enableBoxes){
+		for(NumberedBox box: _numberedBoxes){
 			box.setSelected(false);
 		}
 
@@ -437,7 +438,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 	}
 
 
-	public class numPadListener implements ActionListener{
+	private class numPadListener implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -476,23 +477,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		return sb.toString();
 	}
 
-	public class NewRaceListener implements ActionListener{
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			RaceType newRace = (RaceType) JOptionPane.showInputDialog(
-					new JFrame(),
-					"Select Race Type",
-					"A Choice",
-					JOptionPane.PLAIN_MESSAGE,
-					null,
-					RaceType.values(),
-					RaceType.IND);
-			if(newRace != null)
-			    _timer.executeCmd(new EventCmd(LocalTime.now(), newRace));
-		}
-	}
-	public class FunctionListener implements ActionListener{
+	private class FunctionListener implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -511,11 +496,12 @@ public class ChronoTimerUI extends JFrame implements Observer{
 
 			CTCommand cmd;
 			switch (command){
+				case RESET:
+					setPoweredOn();
 				case START:
 				case FINISH:
 				case NEWRUN:
 				case ENDRUN:
-				case RESET:
 					cmd = new GenericCmd(command, LocalTime.now());
 					break;
 				case TIME:
@@ -556,40 +542,13 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		}
 	}
 
-	public class connectSensorListener implements ActionListener{
 
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			NumberedBox source = (NumberedBox)e.getSource();
-			if(source.isSelected()){
-				SensorType s = (SensorType) JOptionPane.showInputDialog(
-						new JFrame(),
-						"Select Sensor Type",
-						"A Choice",
-						JOptionPane.PLAIN_MESSAGE,
-						null,
-						SensorType.values(),
-						SensorType.EYE);
-				if(s == null)
-				{
-					source.setSelected(false);
-					return;
-				}
-				_timer.executeCmd(new ConnectCmd(s,source.channel,LocalTime.now()));
-			}
-			else{
-				_timer.executeCmd(new DisconnectCmd(LocalTime.now(),source.channel));
-			}
-		}
-	}
 
 	public static void main(String[] args){
 
 		new ChronoTimerUI();
 	}
 }
-
-
 
 
 
