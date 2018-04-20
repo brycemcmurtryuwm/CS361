@@ -73,6 +73,10 @@ public class RaceTime {
 	 * @return string with minutes, seconds and hundredths of a secons
 	 */
 	public String toStringMinutes(){
+		if(isDNF()){
+			return "DNF";
+		}
+
 		String str = "";
 
 		Duration d = this.getDuration();

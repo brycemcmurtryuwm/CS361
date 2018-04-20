@@ -24,7 +24,7 @@ public class ParIndRace extends Race {
 
 	@Override
 	public RaceType getRaceType() {
-		return RaceType.IND;
+		return RaceType.PARIND;
 	}
 
 	@Override
