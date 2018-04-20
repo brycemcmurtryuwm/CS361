@@ -15,7 +15,6 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +29,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 	private String _buffer = "";
 
 	private List<JComponent> _components = new ArrayList<>();
+    private NumberedBox[] _enableBoxes;
 
 	public ChronoTimerUI(){
 		this.setSize(1000,850);
@@ -80,7 +80,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		JPanel sensorGrid = new JPanel(sensorLayout);
 		sensorGrid.setBorder(new EmptyBorder(100,0,50,0));
 		JButton[] startButtons = new JButton[8];
-		NumberedBox[] enableBoxes = new NumberedBox[8];
+		_enableBoxes = new NumberedBox[8];
 
 
 		sensorGrid.add(new JPanel());
@@ -107,12 +107,12 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		}
 		sensorGrid.add(enableLabel1);
 		for(int i = 0; i < 8; i+=2) {
-			enableBoxes[i] = new NumberedBox(i+1);
-			enableBoxes[i].addActionListener(e -> {
+			_enableBoxes[i] = new NumberedBox(i+1);
+			_enableBoxes[i].addActionListener(e -> {
                 NumberedBox source = (NumberedBox)e.getSource();
                 _timer.executeCmd(new ToggleCmd(LocalTime.now(), source.channel));
             });
-			sensorGrid.add(enableBoxes[i]);
+			sensorGrid.add(_enableBoxes[i]);
 		}
 		sensorGrid.add(new JPanel());
 		JLabel two = new JLabel("2");
@@ -138,9 +138,9 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		}
 		sensorGrid.add(enableLabel2);
 		for(int i = 1; i < 8; i+=2) {
-			enableBoxes[i] = new NumberedBox(i + 1);
-			sensorGrid.add(enableBoxes[i]);
-			enableBoxes[i].addActionListener(e -> {
+			_enableBoxes[i] = new NumberedBox(i + 1);
+			sensorGrid.add(_enableBoxes[i]);
+			_enableBoxes[i].addActionListener(e -> {
                 NumberedBox source = (NumberedBox)e.getSource();
                 _timer.executeCmd(new ToggleCmd(LocalTime.now(), source.channel));
             });
@@ -293,7 +293,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		_components.add(ports);
 
 		try {
-			BufferedImage myPicture = ImageIO.read(new File("ChronoTimer/res/usbImage.jpg"));
+			BufferedImage myPicture = ImageIO.read(new File("res/usbImage.jpg"));
 			JLabel picLabel = new JLabel(new ImageIcon(myPicture));
 			back.add(picLabel);
 			_components.add(picLabel);
@@ -309,6 +309,11 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		}
 
 		_screen.setText(isPoweredOn ? "No Data To Display" : "");
+
+		for(NumberedBox box: _enableBoxes){
+			box.setSelected(false);
+		}
+
 		_printer.setText("");
 	}
 
@@ -381,7 +386,8 @@ public class ChronoTimerUI extends JFrame implements Observer{
 					null,
 					RaceType.values(),
 					RaceType.IND);
-			_timer.executeCmd(new EventCmd(LocalTime.now(), newRace));
+			if(newRace != null)
+			    _timer.executeCmd(new EventCmd(LocalTime.now(), newRace));
 		}
 	}
 
@@ -410,7 +416,6 @@ public class ChronoTimerUI extends JFrame implements Observer{
 	}
 
 	public static void main(String[] args){
-		
 
 		new ChronoTimerUI();
 	}
