@@ -108,7 +108,7 @@ public class IndividualRace extends Race {
     }
 
     @Override
-    protected List<Athlete> athletesRunning() {
+    public List<Athlete> athletesRunning() {
         return new ArrayList<>(_currentlyRacing);
     }
 

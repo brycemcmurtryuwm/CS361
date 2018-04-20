@@ -31,6 +31,7 @@ public class ChronoTimer {
 
         printer = new Printer(out);
         Channel.ChannelListener = currentRace;
+        setRaceObserver(RunRepository.getRunRepository());
     }
 
     public void setRaceObserver(Observer o){
@@ -61,7 +62,6 @@ public class ChronoTimer {
 
         if(cmd.CMDType == CmdType.POWER){
             poweredOn = !poweredOn;
-            return;
         }
 
         if(!poweredOn)

@@ -153,16 +153,26 @@ public class ParIndRace extends Race {
     }
 
     @Override
-    protected List<Athlete> athletesRunning() {
-        List<Athlete> toReturn = new ArrayList<>(_currentlyRacing1);
-        toReturn.addAll(_currentlyRacing2);
-        return toReturn;
+    public List<Athlete> athletesRunning() {
+		List<Athlete> toReturn = new ArrayList<>();
+
+		for (int i = 0; i < _currentlyRacing1.size(); i++) {
+			toReturn.add(((LinkedList<Athlete>)_currentlyRacing1).get(i));
+			if(i<_currentlyRacing2.size())
+				toReturn.add(((LinkedList<Athlete>)_currentlyRacing2).get(i));
+		}
+		return toReturn;
     }
 
     @Override
     protected List<Athlete> athletesInQueue() {
-        List<Athlete> toReturn = new ArrayList<>(_didNotStartYet1);
-        toReturn.addAll(_didNotStartYet2);
+        List<Athlete> toReturn = new ArrayList<>();
+
+		for (int i = 0; i < _didNotStartYet1.size(); i++) {
+			toReturn.add(((LinkedList<Athlete>)_didNotStartYet1).get(i));
+			if(i<_didNotStartYet2.size())
+				toReturn.add(((LinkedList<Athlete>)_didNotStartYet2).get(i));
+		}
         return toReturn;
     }
 
