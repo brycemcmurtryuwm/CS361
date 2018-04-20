@@ -54,6 +54,8 @@ public class ChronoTimer {
     }
 
     public void executeCmd(CTCommand cmd){
+        if(cmd == null)
+            return;
 
         if(cmd.CMDType == CmdType.POWER){
             poweredOn = !poweredOn;

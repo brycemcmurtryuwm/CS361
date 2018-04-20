@@ -16,10 +16,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalTime;
-import java.util.ArrayList;
+import java.time.format.DateTimeParseException;
+import java.util.*;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 public class ChronoTimerUI extends JFrame implements Observer{
 	private ChronoTimer _timer;
@@ -30,6 +29,9 @@ public class ChronoTimerUI extends JFrame implements Observer{
 
 	private List<JComponent> _components = new ArrayList<>();
     private NumberedBox[] _enableBoxes;
+
+    private NumPadState _numPadState = NumPadState.NumCmd;
+    private String _previousText = "";
 
 	public ChronoTimerUI(){
 		this.setSize(1000,850);
@@ -247,8 +249,76 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		_numPad[11] = new JButton("#");
 		_numPad[11].setFont(font2);
 		_numPad[11].addActionListener(e -> {
-            _timer.executeCmd(new NumCmd(LocalTime.now(), Integer.parseInt(_buffer)));
-            _buffer = "";
+			switch (_numPadState){
+				case NumCmd:
+					if(Objects.equals(_buffer, ""))
+						return;
+
+					_timer.executeCmd(new NumCmd(LocalTime.now(), Integer.parseInt(_buffer)));
+					_buffer = "";
+					break;
+				case AwaitingCancel:
+					if(Objects.equals(_buffer, ""))
+						return;
+
+					_numPadState = NumPadState.NumCmd;
+					_screen.setText(_previousText);
+					_timer.executeCmd(new CancelCmd(LocalTime.now(), Integer.parseInt(_buffer)));
+					_buffer = "";
+					break;
+				case AwaitingDNF:
+					_numPadState = NumPadState.NumCmd;
+					_screen.setText(_previousText);
+
+					if(Objects.equals(_buffer, ""))
+						_timer.executeCmd(new DNFCommand(LocalTime.now()));
+					else _timer.executeCmd(new DNFCommand(LocalTime.now(), Integer.parseInt(_buffer)));
+					_buffer = "";
+					break;
+				case AwaitingPrint:
+					_numPadState = NumPadState.NumCmd;
+					_screen.setText(_previousText);
+
+					if(Objects.equals(_buffer, ""))
+						_timer.executeCmd(new PrintCmd(LocalTime.now()));
+					else _timer.executeCmd(new PrintCmd(LocalTime.now(), Integer.parseInt(_buffer)));
+					_buffer = "";
+					break;
+				case AwaitingCLR:
+					if(Objects.equals(_buffer, ""))
+						return;
+
+					_numPadState = NumPadState.NumCmd;
+					_screen.setText(_previousText);
+					_timer.executeCmd(new ClearCmd(LocalTime.now(), Integer.parseInt(_buffer)));
+					_buffer = "";
+					break;
+				case AwaitingExport:
+					_numPadState = NumPadState.NumCmd;
+					_screen.setText(_previousText);
+
+					if(Objects.equals(_buffer, ""))
+						_timer.executeCmd(new ExportCmd(LocalTime.now()));
+					else _timer.executeCmd(new ExportCmd(LocalTime.now(), Integer.parseInt(_buffer)));
+					_buffer = "";
+					break;
+				case AwaitingTime:
+					if(Objects.equals(_buffer, ""))
+						return;
+
+					try{
+						LocalTime t = LocalTime.parse(getNumPadTime());
+
+						_numPadState = NumPadState.NumCmd;
+						_screen.setText(_previousText);
+						_buffer = "";
+
+						_timer.executeCmd(new TimeCmd(LocalTime.now(), t));
+					}
+					 catch(DateTimeParseException exp){
+					}
+					break;
+			}
         });
 
 		numPanel.add(_numPad[11]);
@@ -373,8 +443,39 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		public void actionPerformed(ActionEvent e) {
 			JButton source = (JButton)e.getSource();
 			_buffer += source.getText();
+
+			if(_numPadState == NumPadState.AwaitingTime){
+				_screen.setText("Use the numpad to set the Time. Press '#' to enter\n\t" + getNumPadTime());
+			}
 		}
 	}
+
+	private String getNumPadTime(){
+		//7 places
+		Queue<Integer> timeQueue = new LinkedList<>();
+		Integer[] ints = new Integer[]{0,0,0,0,0,0,0};
+		Collections.addAll(timeQueue,ints);
+
+		for(char c: _buffer.toCharArray()){
+			int i = Integer.parseInt(c + "");
+
+			timeQueue.poll();
+			timeQueue.add(i);
+		}
+
+		StringBuilder sb = new StringBuilder();
+		int i = 0;
+
+		while (!timeQueue.isEmpty()){
+			if(++i == 3 || i == 5)
+				sb.append(':');
+			if(i==7)
+				sb.append('.');
+			sb.append(timeQueue.poll());
+		}
+		return sb.toString();
+	}
+
 	public class NewRaceListener implements ActionListener{
 
 		@Override
@@ -395,7 +496,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			CmdType[] fuctions = {CmdType.CANCEL, CmdType.ENDRUN, CmdType.EXPORT, CmdType.NEWRUN};
+			CmdType[] fuctions = {CmdType.RESET, CmdType.TIME, CmdType.DNF, CmdType.CANCEL, CmdType.START, CmdType.FINISH, CmdType.NEWRUN, CmdType.ENDRUN, CmdType.PRINT, CmdType.CLR, CmdType.EXPORT};
 			CmdType command = (CmdType) JOptionPane.showInputDialog(
 					new JFrame(),
 					"Select Command",
@@ -404,16 +505,54 @@ public class ChronoTimerUI extends JFrame implements Observer{
 					null,
 					fuctions,
 					CmdType.CANCEL);
-			if(command == CmdType.CANCEL){
-				new CancelCmd(LocalTime.now(), Integer.parseInt(_buffer));
-				_buffer = "";
+
+			if(command == null)
 				return;
+
+			CTCommand cmd;
+			switch (command){
+				case START:
+				case FINISH:
+				case NEWRUN:
+				case ENDRUN:
+				case RESET:
+					cmd = new GenericCmd(command, LocalTime.now());
+					break;
+				case TIME:
+					_buffer = "";
+					_previousText = _screen.getText();
+					_screen.setText("Use the numpad to set the Time. Press '#' to enter\n\t00:00:00.0");
+					_numPadState = NumPadState.AwaitingTime;
+					return;
+				case DNF:
+					_previousText = _screen.getText();
+					_screen.setText("Use the numpad to enter the Athlete Number to mark as DNF. Press '#' to enter");
+					_numPadState = NumPadState.AwaitingDNF;
+					return;
+				case CANCEL:
+					_previousText = _screen.getText();
+					_screen.setText("Use the numpad to enter the Athlete Number to Cancel. Press '#' to enter");
+					_numPadState = NumPadState.AwaitingCancel;
+					return;
+				case PRINT:
+					_previousText = _screen.getText();
+					_screen.setText("Use the numpad to enter the Race to Print. Press '#' to enter");
+					_numPadState = NumPadState.AwaitingPrint;
+					return;
+				case CLR:
+					_previousText = _screen.getText();
+					_screen.setText("Use the numpad to enter the Athlete Number to Clear. Press '#' to enter");
+					_numPadState = NumPadState.AwaitingCLR;
+					return;
+				case EXPORT:
+					_previousText = _screen.getText();
+					_screen.setText("Use the numpad to enter the Race to Export. Press '#' to enter");
+					_numPadState = NumPadState.AwaitingExport;
+					return;
+				default:
+					return;
 			}
-			if(command == CmdType.EXPORT){
-				new ExportCmd(LocalTime.now());
-				return;
-			}
-			_timer.executeCmd(new GenericCmd(command, LocalTime.now()));
+			_timer.executeCmd(cmd);
 		}
 	}
 
@@ -432,7 +571,10 @@ public class ChronoTimerUI extends JFrame implements Observer{
 						SensorType.values(),
 						SensorType.EYE);
 				if(s == null)
+				{
+					source.setSelected(false);
 					return;
+				}
 				_timer.executeCmd(new ConnectCmd(s,source.channel,LocalTime.now()));
 			}
 			else{
