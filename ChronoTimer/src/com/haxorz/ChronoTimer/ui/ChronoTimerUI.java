@@ -4,6 +4,7 @@ import com.haxorz.ChronoTimer.ChronoTimer;
 import com.haxorz.ChronoTimer.Commands.*;
 import com.haxorz.ChronoTimer.Hardware.SensorType;
 import com.haxorz.ChronoTimer.Races.Race;
+import com.haxorz.ChronoTimer.Races.RaceType;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -165,6 +166,8 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		//Function, arrows, and Swap
 		JPanel randomButtons = new JPanel();
 		randomButtons.setBorder(new EmptyBorder(0,50,0,50));
+		/*
+		//as it is now the function and arrows have no purpose
 		JButton functionButton = new JButton("Function");
 		functionButton.setFont(font);
 		functionButton.setAlignmentX(2);
@@ -182,7 +185,11 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		JButton upButton = new JButton(""+(char)9650);
 		upButton.setFont(font);
 		arrows.add(upButton);
-		randomButtons.add(arrows);
+		randomButtons.add(arrows);*/
+		JButton newRaceButton = new JButton("Create Race");
+		newRaceButton.setFont(font);
+		newRaceButton.addActionListener(new NewRaceListener());
+		randomButtons.add(newRaceButton);
 
 		randomButtons.add(new JLabel("                                                    "));	//filler
 		randomButtons.add(new JLabel("                                                    "));
@@ -360,6 +367,21 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		public void actionPerformed(ActionEvent e) {
 			JButton source = (JButton)e.getSource();
 			_buffer += source.getText();
+		}
+	}
+	public class NewRaceListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			RaceType newRace = (RaceType) JOptionPane.showInputDialog(
+					new JFrame(),
+					"Select Race Type",
+					"A Choice",
+					JOptionPane.PLAIN_MESSAGE,
+					null,
+					RaceType.values(),
+					RaceType.IND);
+			_timer.executeCmd(new EventCmd(LocalTime.now(), newRace));
 		}
 	}
 
