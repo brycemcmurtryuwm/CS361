@@ -143,6 +143,8 @@ public class ParIndRace extends Race {
 				_didNotStartYet2.remove(a);
 				break;
 		}
+		this.setChanged();
+		this.notifyObservers();
 	}
 
     @Override
@@ -175,6 +177,8 @@ public class ParIndRace extends Race {
 				athlete.getTimeTracker(Race.RunNumber).setStartTime(timeStamp);
 				RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 1\n");
 				_currentlyRacing1.add(athlete);
+				this.setChanged();
+				this.notifyObservers();
 			}
 			else
 				RunRepository.addToCurrentRun("Athlete ??? TRIG Channel 1\n");
@@ -187,6 +191,8 @@ public class ParIndRace extends Race {
 				RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 2\n");
 				RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " ELAPSED " + athlete.getTimeTracker(Race.RunNumber).toStringMinutes() + "\n");
 				_finished.add(athlete);
+				this.setChanged();
+				this.notifyObservers();
 			}
 			else
 				RunRepository.addToCurrentRun("Athlete ??? TRIG Channel 2\n");
@@ -200,6 +206,8 @@ public class ParIndRace extends Race {
 				athlete.getTimeTracker(Race.RunNumber).setStartTime(timeStamp);
 				RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 3\n");
 				_currentlyRacing2.add(athlete);
+				this.setChanged();
+				this.notifyObservers();
 			}
 			else
 				RunRepository.addToCurrentRun("Athlete ??? TRIG Channel 3\n");
@@ -212,6 +220,8 @@ public class ParIndRace extends Race {
 				RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 4\n");
 				RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " ELAPSED " + athlete.getTimeTracker(Race.RunNumber).toStringMinutes() + "\n");
 				_finished.add(athlete);
+				this.setChanged();
+				this.notifyObservers();
 			}
 			else
 				RunRepository.addToCurrentRun("Athlete ??? TRIG Channel 4\n");
