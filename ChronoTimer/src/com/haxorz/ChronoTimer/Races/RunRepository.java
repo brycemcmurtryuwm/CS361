@@ -56,7 +56,7 @@ public class RunRepository {
         }
     }
 
-    public static List<AthleteJson> getAthletsStatus(int raceNumber){
+    public static List<AthleteJson> getAthleteStatus(int raceNumber){
         if(!AthletesPerRun.containsKey(raceNumber))
             return new ArrayList<>();
 

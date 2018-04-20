@@ -3,9 +3,7 @@ package com.haxorz.ChronoTimer.Races;
 import com.haxorz.ChronoTimer.Commands.*;
 
 import java.time.LocalTime;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 public class IndividualRace extends Race {
 
@@ -100,6 +98,23 @@ public class IndividualRace extends Race {
                 _didNotStartYet.remove(a);
                 break;
         }
+        this.setChanged();
+        this.notifyObservers();
+    }
+
+    @Override
+    protected List<Athlete> getCompletedAthletes() {
+        return new ArrayList<>(_finished);
+    }
+
+    @Override
+    protected List<Athlete> athletesRunning() {
+        return new ArrayList<>(_currentlyRacing);
+    }
+
+    @Override
+    protected List<Athlete> athletesInQueue() {
+        return new ArrayList<>(_didNotStartYet);
     }
 
 
@@ -113,6 +128,8 @@ public class IndividualRace extends Race {
                 athlete.getTimeTracker(Race.RunNumber).setStartTime(timeStamp);
                 RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 1\n");
                 _currentlyRacing.add(athlete);
+                this.setChanged();
+                this.notifyObservers();
             }
             else
                 RunRepository.addToCurrentRun("Athlete ??? TRIG Channel 1\n");
@@ -125,6 +142,8 @@ public class IndividualRace extends Race {
                 RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 2\n");
                 RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " ELAPSED " + athlete.getTimeTracker(Race.RunNumber).toStringMinutes() + "\n");
                 _finished.add(athlete);
+                this.setChanged();
+                this.notifyObservers();
             }
             else
                 RunRepository.addToCurrentRun("Athlete ??? TRIG Channel 2\n");

@@ -36,6 +36,8 @@ public class Printer {
 
 
     public void log(CTCommand cmd) {
+        if(!_printerOn) return;
+
         out.println(cmd.ToString());
     }
 }

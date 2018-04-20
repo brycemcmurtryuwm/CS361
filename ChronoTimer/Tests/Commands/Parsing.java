@@ -24,6 +24,10 @@ public class Parsing {
 	@Test
 	public void testWithoutStamp(){
 		CTCommand c =CTCommand.ParseFromString("cancel");
+		Assert.assertTrue(c == null);
+
+
+		c =CTCommand.ParseFromString("cancel 123");
 		Assert.assertTrue(c instanceof CancelCmd);
 	}
 	@Test
@@ -44,6 +48,10 @@ public class Parsing {
 	@Test
 	public void testPrint(){
 		CTCommand c =CTCommand.ParseFromString("21:10:10 Print hello");
+		Assert.assertTrue(c == null);
+
+
+		c =CTCommand.ParseFromString("21:10:10 Print 1");
 		Assert.assertTrue(c instanceof PrintCmd);
 	}
 }

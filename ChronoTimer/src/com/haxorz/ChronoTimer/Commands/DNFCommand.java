@@ -4,7 +4,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 public class DNFCommand extends CTCommand {
-	int lane;
+	private int lane;
 
 	public DNFCommand(LocalTime timeStamp, int lane) {
 		super(CmdType.DNF, timeStamp);
