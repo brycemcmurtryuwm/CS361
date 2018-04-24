@@ -21,6 +21,10 @@ public class GrpRace extends Race {
         _finished = new LinkedList<>();
     }
 
+    public LocalTime getStartTime() {
+        return _startTime;
+    }
+
     @Override
     public RaceType getRaceType() {
         return RaceType.GRP;
@@ -42,11 +46,11 @@ public class GrpRace extends Race {
                 _startTime = null;
                 _athleteNum = 0;
 
+                this.setChanged();
+                this.notifyObservers();
+
                 if(cmd.CMDType == CmdType.ENDRUN)
-                {
-                    updateRunRepository();
                     break;
-                }
 
                 Race.RunNumber++;
                 break;
@@ -61,9 +65,8 @@ public class GrpRace extends Race {
                     COMPETITORS.put(numCmd.Number, athlete);
                 }
 
-                athlete.registerForRace(Race.RunNumber);
-
                 if(_startTime != null){
+                    athlete.registerForRace(Race.RunNumber);
                     athlete.getTimeTracker(Race.RunNumber).setStartTime(_startTime);
                     Athlete temp = _runStore.poll();
 
@@ -74,6 +77,8 @@ public class GrpRace extends Race {
                     }
 
                 }
+                this.setChanged();
+                this.notifyObservers();
                 break;
             case CANCEL:
                 //NO Cancel
@@ -95,7 +100,7 @@ public class GrpRace extends Race {
     }
 
     @Override
-    protected List<Athlete> athletesRunning() {
+    public List<Athlete> athletesRunning() {
         return new ArrayList<>();
     }
 
@@ -118,7 +123,6 @@ public class GrpRace extends Race {
         }
     }
 
-
     @Override
     public void channelTriggered(int channelNum, LocalTime timeStamp) {
         if(channelNum == 1)
@@ -131,17 +135,21 @@ public class GrpRace extends Race {
             _startTime = timeStamp;
 
             RunRepository.addToCurrentRun("GRP Race Start TRIG Channel 1\n");
+            this.setChanged();
+            this.notifyObservers();
         }
         else if(channelNum == 2){
-            Athlete athlete = new Athlete(++_athleteNum);
-
             if(_startTime != null){
+                Athlete athlete = new Athlete(++_athleteNum);
+
                 athlete.registerForRace(Race.RunNumber);
                 athlete.getTimeTracker(Race.RunNumber).setStartTime(_startTime);
                 athlete.getTimeTracker(Race.RunNumber).setEndTime(timeStamp);
                 RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 2\n");
                 RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " ELAPSED " + athlete.getTimeTracker(Race.RunNumber).toStringMinutes() + "\n");
                 _runStore.add(athlete);
+                this.setChanged();
+                this.notifyObservers();
             }
             else
                 RunRepository.addToCurrentRun("GRP Race TRIG Channel 2 Before Start\n");

@@ -98,6 +98,8 @@ public class IndividualRace extends Race {
                 _didNotStartYet.remove(a);
                 break;
         }
+        this.setChanged();
+        this.notifyObservers();
     }
 
     @Override
@@ -106,7 +108,7 @@ public class IndividualRace extends Race {
     }
 
     @Override
-    protected List<Athlete> athletesRunning() {
+    public List<Athlete> athletesRunning() {
         return new ArrayList<>(_currentlyRacing);
     }
 
@@ -126,6 +128,8 @@ public class IndividualRace extends Race {
                 athlete.getTimeTracker(Race.RunNumber).setStartTime(timeStamp);
                 RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 1\n");
                 _currentlyRacing.add(athlete);
+                this.setChanged();
+                this.notifyObservers();
             }
             else
                 RunRepository.addToCurrentRun("Athlete ??? TRIG Channel 1\n");
@@ -138,6 +142,8 @@ public class IndividualRace extends Race {
                 RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 2\n");
                 RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " ELAPSED " + athlete.getTimeTracker(Race.RunNumber).toStringMinutes() + "\n");
                 _finished.add(athlete);
+                this.setChanged();
+                this.notifyObservers();
             }
             else
                 RunRepository.addToCurrentRun("Athlete ??? TRIG Channel 2\n");

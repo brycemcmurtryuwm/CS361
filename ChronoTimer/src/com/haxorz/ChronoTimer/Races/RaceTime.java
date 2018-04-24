@@ -28,6 +28,9 @@ public class RaceTime {
 		if(_startTime != null && _endTime != null){
 			return Duration.between(_startTime, _endTime);
 		}
+		else if(_startTime != null && _endTime == null){
+			return Duration.between(_startTime, SystemClock.now());
+		}
 		throw new IllegalStateException("Start and/or End time not set");
 	}
 
@@ -73,6 +76,10 @@ public class RaceTime {
 	 * @return string with minutes, seconds and hundredths of a secons
 	 */
 	public String toStringMinutes(){
+		if(isDNF()){
+			return "DNF";
+		}
+
 		String str = "";
 
 		Duration d = this.getDuration();

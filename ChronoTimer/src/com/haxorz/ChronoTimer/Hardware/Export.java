@@ -11,7 +11,7 @@ public class Export {
 
     public static void SaveRunToFile(int runNum){
         Gson gson = new Gson();
-        String json = gson.toJson(RunRepository.getAthletsStatus(runNum));
+        String json = gson.toJson(RunRepository.getAthleteStatus(runNum));
 
         File file = new File("RUN" + runNum + ".txt");
         try {

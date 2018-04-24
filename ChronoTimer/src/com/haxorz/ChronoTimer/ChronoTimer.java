@@ -31,6 +31,7 @@ public class ChronoTimer {
 
         printer = new Printer(out);
         Channel.ChannelListener = currentRace;
+        setRaceObserver(RunRepository.getRunRepository());
     }
 
     public void setRaceObserver(Observer o){
@@ -43,6 +44,7 @@ public class ChronoTimer {
         Race.COMPETITORS.clear();
         Race.RunNumber = 0;
         RunRepository.clear();
+        currentRace.deleteObservers();
         currentRace = new IndividualRace();
         sensors = new InputSensor[12];
 
@@ -50,14 +52,16 @@ public class ChronoTimer {
             channels[i] = new Channel(i+1);
         }
 
+        setObservers();
         Channel.ChannelListener = currentRace;
     }
 
     public void executeCmd(CTCommand cmd){
+        if(cmd == null)
+            return;
 
         if(cmd.CMDType == CmdType.POWER){
             poweredOn = !poweredOn;
-            return;
         }
 
         if(!poweredOn)

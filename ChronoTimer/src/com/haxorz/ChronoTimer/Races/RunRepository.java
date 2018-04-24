@@ -1,10 +1,12 @@
 package com.haxorz.ChronoTimer.Races;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import com.haxorz.ChronoTimer.SystemClock;
 
-public class RunRepository {
+import java.security.PublicKey;
+import java.time.LocalTime;
+import java.util.*;
+
+public class RunRepository extends Observable implements Observer {
 
     public static final HashMap<Integer, String> CompletedRuns = new HashMap<>();
 
@@ -12,13 +14,26 @@ public class RunRepository {
 
     private static String currentRun = "";
 
+    public static List<String> Finalists = new ArrayList<>();
+    public static List<Athlete> Running = new ArrayList<>();
+    public static List<String> InQueue = new ArrayList<>();
+    public static RaceType RaceType = com.haxorz.ChronoTimer.Races.RaceType.IND;
+    public static LocalTime GRPSTART = null;
+    public static Object Lock = new Object();
+
+    private static RunRepository _repository = new RunRepository();
+
+    public static RunRepository getRunRepository(){ return _repository;}
+
+    private RunRepository(){}
+
     public static void addToCurrentRun(String s){
         currentRun += s;
     }
 
     public static void EndCurrentRun(int raceNumber){
         CompletedRuns.put(raceNumber, currentRun);
-        currentRun = "";
+        clearCurrentRun();
     }
 
     public static String getCurrentRun() {
@@ -26,7 +41,7 @@ public class RunRepository {
     }
 
     public static void clear() {
-        currentRun = "";
+        clearCurrentRun();
         CompletedRuns.clear();
         AthletesPerRun.clear();
     }
@@ -56,7 +71,7 @@ public class RunRepository {
         }
     }
 
-    public static List<AthleteJson> getAthletsStatus(int raceNumber){
+    public static List<AthleteJson> getAthleteStatus(int raceNumber){
         if(!AthletesPerRun.containsKey(raceNumber))
             return new ArrayList<>();
 
@@ -83,5 +98,29 @@ public class RunRepository {
 
     public static void clearCurrentRun() {
         currentRun = "";
+        synchronized (Lock){
+            Finalists.clear();
+            Running.clear();
+            InQueue.clear();
+        }
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        if(o instanceof Race){
+            synchronized (Lock){
+                RaceType = ((Race) o).getRaceType();
+                Finalists = ((Race) o).getCompletedTimes();
+                Running = ((Race) o).athletesRunning();
+                InQueue = ((Race) o).getAthletesInQueue();
+
+                if(RaceType == com.haxorz.ChronoTimer.Races.RaceType.GRP)
+                    GRPSTART = ((GrpRace)o).getStartTime();
+
+                _repository.setChanged();
+                _repository.notifyObservers();
+            }
+
+        }
     }
 }

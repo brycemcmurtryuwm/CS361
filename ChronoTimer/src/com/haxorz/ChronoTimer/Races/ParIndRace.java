@@ -24,7 +24,7 @@ public class ParIndRace extends Race {
 
 	@Override
 	public RaceType getRaceType() {
-		return RaceType.IND;
+		return RaceType.PARIND;
 	}
 
 	@Override
@@ -143,6 +143,8 @@ public class ParIndRace extends Race {
 				_didNotStartYet2.remove(a);
 				break;
 		}
+		this.setChanged();
+		this.notifyObservers();
 	}
 
     @Override
@@ -151,16 +153,26 @@ public class ParIndRace extends Race {
     }
 
     @Override
-    protected List<Athlete> athletesRunning() {
-        List<Athlete> toReturn = new ArrayList<>(_currentlyRacing1);
-        toReturn.addAll(_currentlyRacing2);
-        return toReturn;
+    public List<Athlete> athletesRunning() {
+		List<Athlete> toReturn = new ArrayList<>();
+
+		for (int i = 0; i < _currentlyRacing1.size(); i++) {
+			toReturn.add(((LinkedList<Athlete>)_currentlyRacing1).get(i));
+			if(i<_currentlyRacing2.size())
+				toReturn.add(((LinkedList<Athlete>)_currentlyRacing2).get(i));
+		}
+		return toReturn;
     }
 
     @Override
     protected List<Athlete> athletesInQueue() {
-        List<Athlete> toReturn = new ArrayList<>(_didNotStartYet1);
-        toReturn.addAll(_didNotStartYet2);
+        List<Athlete> toReturn = new ArrayList<>();
+
+		for (int i = 0; i < _didNotStartYet1.size(); i++) {
+			toReturn.add(((LinkedList<Athlete>)_didNotStartYet1).get(i));
+			if(i<_didNotStartYet2.size())
+				toReturn.add(((LinkedList<Athlete>)_didNotStartYet2).get(i));
+		}
         return toReturn;
     }
 
@@ -175,6 +187,8 @@ public class ParIndRace extends Race {
 				athlete.getTimeTracker(Race.RunNumber).setStartTime(timeStamp);
 				RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 1\n");
 				_currentlyRacing1.add(athlete);
+				this.setChanged();
+				this.notifyObservers();
 			}
 			else
 				RunRepository.addToCurrentRun("Athlete ??? TRIG Channel 1\n");
@@ -187,6 +201,8 @@ public class ParIndRace extends Race {
 				RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 2\n");
 				RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " ELAPSED " + athlete.getTimeTracker(Race.RunNumber).toStringMinutes() + "\n");
 				_finished.add(athlete);
+				this.setChanged();
+				this.notifyObservers();
 			}
 			else
 				RunRepository.addToCurrentRun("Athlete ??? TRIG Channel 2\n");
@@ -200,6 +216,8 @@ public class ParIndRace extends Race {
 				athlete.getTimeTracker(Race.RunNumber).setStartTime(timeStamp);
 				RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 3\n");
 				_currentlyRacing2.add(athlete);
+				this.setChanged();
+				this.notifyObservers();
 			}
 			else
 				RunRepository.addToCurrentRun("Athlete ??? TRIG Channel 3\n");
@@ -212,6 +230,8 @@ public class ParIndRace extends Race {
 				RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel 4\n");
 				RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " ELAPSED " + athlete.getTimeTracker(Race.RunNumber).toStringMinutes() + "\n");
 				_finished.add(athlete);
+				this.setChanged();
+				this.notifyObservers();
 			}
 			else
 				RunRepository.addToCurrentRun("Athlete ??? TRIG Channel 4\n");
