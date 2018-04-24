@@ -2,7 +2,10 @@ package com.haxorz.ChronoTimer.ui;
 
 import com.haxorz.ChronoTimer.ChronoTimer;
 import com.haxorz.ChronoTimer.Commands.*;
+import com.haxorz.ChronoTimer.Races.Athlete;
 import com.haxorz.ChronoTimer.Races.Race;
+import com.haxorz.ChronoTimer.Races.RunRepository;
+import com.haxorz.ChronoTimer.SystemClock;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -13,17 +16,20 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.List;
 import java.util.Queue;
 
+import static com.haxorz.ChronoTimer.Races.RunRepository.*;
+
 public class ChronoTimerUI extends JFrame implements Observer{
 	private ChronoTimer _timer;
 	private JButton[] _numPad = new JButton[12];
 	private JTextPane _screen;
-	private JTextPane _printer;
+	private JTextPane _printer = new JTextPane();
 	private String _buffer = "";
 
 	private List<JComponent> _components = new ArrayList<>();
@@ -31,14 +37,15 @@ public class ChronoTimerUI extends JFrame implements Observer{
 
     private NumPadState _numPadState = NumPadState.NumCmd;
     private String _previousText = "";
+	private RunningDisplayTimer _rdt;
 
 	public ChronoTimerUI(){
 		this.setSize(1000,850);
 		this.setResizable(false);
 		this.setTitle("ChronoTimer 1009");
-		createComponents();
 		_timer = new ChronoTimer(new JPanelPrintStream(_printer));
-		_timer.setRaceObserver(this);
+		createComponents();
+		RunRepository.getRunRepository().addObserver(this);
 		setVisible(true);
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setPoweredOn();
@@ -156,7 +163,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		JButton printerPower = new JButton("Printer Pwr");
 		printerPower.addActionListener(e -> _timer.executeCmd(new GenericCmd(CmdType.PRINTPWR, LocalTime.now())));
 		printerPanel.add(printerPower);
-		_printer = new JTextPane();
+
 		_printer.setEditable(false);
 		JScrollPane printerScroll = new JScrollPane(_printer);
 		_printer.setPreferredSize(new Dimension(250,280));
@@ -213,6 +220,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		//screenPanel
 		JPanel screenPanel = new JPanel();
 		_screen = new JTextPane();
+		_screen.setEditable(false);
 		_screen.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
 		_screen.setPreferredSize(new Dimension(250,280));
 		_screen.setMaximumSize(new Dimension(250,280));
@@ -369,6 +377,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 			JLabel picLabel = new JLabel(new ImageIcon(myPicture));
 			back.add(picLabel);
 			_components.add(picLabel);
+			_rdt = new RunningDisplayTimer(_screen);
 		}catch(IOException e){}
 		this.add(back, BorderLayout.SOUTH);
 	}
@@ -380,7 +389,11 @@ public class ChronoTimerUI extends JFrame implements Observer{
 			setComponentsEnabled(jC, isPoweredOn);
 		}
 
+		_rdt._updateTimer.stop();
 		_screen.setText(isPoweredOn ? "No Data To Display" : "");
+
+		if(isPoweredOn)
+			_rdt._updateTimer.start();
 
 		for(NumberedBox box: _numberedBoxes){
 			box.setSelected(false);
@@ -401,39 +414,57 @@ public class ChronoTimerUI extends JFrame implements Observer{
 
 	@Override
 	public void update(Observable o, Object arg) {
-		if(o instanceof Race){
+		_screen.setText(getRaceDisplayText());
+	}
+
+	public static String getRaceDisplayText(){
+		synchronized (Lock){
+			if(InQueue.size()+Running.size()+Finalists.size() == 0 && RaceType != com.haxorz.ChronoTimer.Races.RaceType.GRP){
+				return  "No Data To Display";
+			}
+
 			StringBuilder sb = new StringBuilder();
 
-			List<String> finalists = ((Race) o).getCompletedTimes();
-			List<String> running = ((Race) o).getAthletesRunning();
-			List<String> inQueue = ((Race) o).getAthletesInQueue();
+			if(InQueue.size()>0 || RaceType == com.haxorz.ChronoTimer.Races.RaceType.GRP){
 
-			if(finalists.size()>0){
-				sb.append("Final Times: \n");
-				for (String s: finalists){
-					sb.append(s).append("\n");
+				switch (RaceType){
+					case IND:
+						sb.append("In Queue: \n");
+						for (int i = 0; i < 3 && i < InQueue.size(); i++) {
+							sb.append(InQueue.get(i)).append("\n");
+						}
+						break;
+					case PARIND:
+						sb.append("In Queue: \n");
+						for (int i = 0; i < 2 && i < InQueue.size(); i++) {
+							sb.append(InQueue.get(i)).append("\n");
+						}
+						break;
+					case GRP:
+						sb.append("Running Time: ");
+						if(GRPSTART != null)
+							sb.append(SystemClock.toStringMinutes(Duration.between(GRPSTART, SystemClock.now()))).append("\n");
+						break;
+					case PARGRP:
+						break;
 				}
 			}
 
-			if(running.size()>0){
+			if(Running.size()>0){
 				sb.append("Currently Running: \n");
-				for (String s: running){
-					sb.append(s).append("\n");
+				for (Athlete a: Running){
+					sb.append("Athlete ").append(a.getNumber()).append(": ").append(a.getTimeTracker(Race.RunNumber).toStringMinutes()).append("\n");
 				}
 			}
 
-			if(inQueue.size()>0){
-				sb.append("In Queue: \n");
-				for (String s: inQueue){
-					sb.append(s).append("\n");
+			if(Finalists.size()>0){
+				sb.append("Final Times: \n");
+
+				for (int i = Finalists.size()-1; i >= 0 ; i--) {
+					sb.append(Finalists.get(i)).append("\n");
 				}
 			}
-
-			if(inQueue.size()+running.size()+finalists.size() == 0){
-				_screen.setText("No Data To Display");
-				return;
-			}
-			_screen.setText(sb.toString());
+			return sb.toString();
 		}
 	}
 

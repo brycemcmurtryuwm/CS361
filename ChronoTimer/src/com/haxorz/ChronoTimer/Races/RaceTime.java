@@ -28,6 +28,9 @@ public class RaceTime {
 		if(_startTime != null && _endTime != null){
 			return Duration.between(_startTime, _endTime);
 		}
+		else if(_startTime != null && _endTime == null){
+			return Duration.between(_startTime, SystemClock.now());
+		}
 		throw new IllegalStateException("Start and/or End time not set");
 	}
 

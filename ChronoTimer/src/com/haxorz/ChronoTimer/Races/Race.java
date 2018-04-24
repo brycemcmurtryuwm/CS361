@@ -59,7 +59,7 @@ public abstract class Race extends Observable implements ChannelListener {
 
     protected abstract List<Athlete> getCompletedAthletes();
 
-    protected abstract List<Athlete> athletesRunning();
+    public abstract List<Athlete> athletesRunning();
 
     protected abstract List<Athlete> athletesInQueue();
 

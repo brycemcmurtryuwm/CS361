@@ -21,6 +21,10 @@ public class GrpRace extends Race {
         _finished = new LinkedList<>();
     }
 
+    public LocalTime getStartTime() {
+        return _startTime;
+    }
+
     @Override
     public RaceType getRaceType() {
         return RaceType.GRP;
@@ -96,7 +100,7 @@ public class GrpRace extends Race {
     }
 
     @Override
-    protected List<Athlete> athletesRunning() {
+    public List<Athlete> athletesRunning() {
         return new ArrayList<>();
     }
 
@@ -131,6 +135,8 @@ public class GrpRace extends Race {
             _startTime = timeStamp;
 
             RunRepository.addToCurrentRun("GRP Race Start TRIG Channel 1\n");
+            this.setChanged();
+            this.notifyObservers();
         }
         else if(channelNum == 2){
             if(_startTime != null){
