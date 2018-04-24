@@ -1,26 +1,49 @@
 package com.haxorz.lab12;
 
-import com.haxorz.lab12.GarageCmd;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.util.Scanner;
 
 public class Driver {
 
+    public static boolean STOP = false;
+
+    public static void main(String[] args){
+        System.out.println("Initializing");
+
+        ReadConsoleInput(System.in, System.out);
+
+    }
+
+    public static void ReadConsoleInput(InputStream in, PrintStream out){
+        GarageDoorSystem chronoTimer = new GarageDoorSystem(out);
+        Scanner sc = new Scanner(in);
+
+        while(!STOP){
+            String line = sc.nextLine();
+
+            GarageCmd cmd = GetCommand(line);
+            if(cmd != null)
+                chronoTimer.execute(cmd);
+        }
+    }
 
 
-    public GarageCmd GetCommand(String s){
+    public static GarageCmd GetCommand(String s){
 
         switch (s.toLowerCase()){
             case "lclick":
-                break;
+                return  GarageCmd.LightClick;
             case "dclick":
-                break;
+                return  GarageCmd.DoorClick;
             case "limit":
-                break;
+                return  GarageCmd.DoorLimit;
             case "safety":
-                break;
+                return  GarageCmd.DoorSafety;
             case "off":
-                break;
-                default:
-                    break;
+                return  GarageCmd.OFF;
+            default:
+                return null;
         }
 
     }

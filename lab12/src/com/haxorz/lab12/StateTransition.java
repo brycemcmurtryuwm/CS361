@@ -3,15 +3,19 @@ package com.haxorz.lab12;
 public class StateTransition
 {
     public final DoorState CurrentState;
-    public final GarageCmd Command;
+    public final DoorCmd Command;
 
-    public StateTransition(DoorState currentState, GarageCmd command)
+    public StateTransition(DoorState currentState, DoorCmd command)
     {
         CurrentState = currentState;
         Command = command;
     }
 
 
+    @Override
+    public int hashCode() {
+        return 17 + 7 * CurrentState.hashCode() + 31 * Command.hashCode();
+    }
 
     @Override
     public boolean equals(Object obj)
