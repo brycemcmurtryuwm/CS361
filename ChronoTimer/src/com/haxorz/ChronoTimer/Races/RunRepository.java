@@ -1,8 +1,8 @@
 package com.haxorz.ChronoTimer.Races;
 
-import com.haxorz.ChronoTimer.SystemClock;
+import javafx.util.Pair;
 
-import java.security.PublicKey;
+import java.time.Duration;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -19,7 +19,7 @@ public class RunRepository extends Observable implements Observer {
     public static List<String> InQueue = new ArrayList<>();
     public static RaceType RaceType = com.haxorz.ChronoTimer.Races.RaceType.IND;
     public static LocalTime GRPSTART = null;
-    public static Object Lock = new Object();
+    public static final Object Lock = new Object();
 
     private static RunRepository _repository = new RunRepository();
 
@@ -77,6 +77,7 @@ public class RunRepository extends Observable implements Observer {
 
         List<Athlete> athletes = AthletesPerRun.get(raceNumber);
         List<AthleteJson> toReturn = new ArrayList<>();
+        List<Pair<Duration, AthleteJson>> athleteOrder = new ArrayList<>();
 
         for (int i = 0; i < athletes.size(); i++) {
             Athlete athlete = athletes.get(i);
@@ -89,8 +90,29 @@ public class RunRepository extends Observable implements Observer {
 
             obj.AthleteNumber = athlete.getNumber();
             obj.Status = timeTracker.toString();
+            obj.Time = timeTracker.toStringMinutes();
 
-            toReturn.add(obj);
+            if(timeTracker.getStartTime() != null && timeTracker.getEndTime() == null){
+                obj.Time = "Currently Racing";
+            }
+
+            if(timeTracker.getStartTime() != null && timeTracker.getEndTime() == null){
+                athleteOrder.add(new Pair<>(Duration.ofDays(99999), obj));
+            }
+            else if(timeTracker.getStartTime() == null && timeTracker.getEndTime() == null){
+                athleteOrder.add(new Pair<>(Duration.ofDays(9999999), obj));
+            }
+            else {
+                athleteOrder.add(new Pair<>(timeTracker.getDuration(), obj));
+            }
+        }
+
+        athleteOrder.sort(Comparator.comparing(Pair::getKey));
+
+        int place = 1;
+        for (Pair<Duration, AthleteJson> item: athleteOrder){
+            item.getValue().Place = place++;
+            toReturn.add(item.getValue());
         }
 
         return toReturn;

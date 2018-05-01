@@ -80,6 +80,10 @@ public class RaceTime {
 			return "DNF";
 		}
 
+		if(_startTime == null){
+			return "Waiting to Race";
+		}
+
 		String str = "";
 
 		Duration d = this.getDuration();

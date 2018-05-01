@@ -66,13 +66,14 @@ public class GrpRace extends Race {
                 }
 
                 if(_startTime != null){
-                    athlete.registerForRace(Race.RunNumber);
-                    athlete.getTimeTracker(Race.RunNumber).setStartTime(_startTime);
                     Athlete temp = _runStore.poll();
 
                     if(temp != null){
+                        athlete.registerForRace(Race.RunNumber);
+                        athlete.getTimeTracker(Race.RunNumber).setStartTime(_startTime);
                         athlete.getTimeTracker(Race.RunNumber).setEndTime(temp.getTimeTracker(Race.RunNumber).getEndTime());
                         _finished.add(athlete);
+                        temp.discardRun(Race.RunNumber);
                         updateRunRepository();
                     }
 

@@ -6,6 +6,7 @@ import com.haxorz.ChronoTimer.Hardware.Export;
 import com.haxorz.ChronoTimer.Hardware.InputSensor;
 import com.haxorz.ChronoTimer.Hardware.Printer;
 import com.haxorz.ChronoTimer.Races.*;
+import com.haxorz.ChronoTimer.Web.Client;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ public class ChronoTimer {
         printer = new Printer(out);
         Channel.ChannelListener = currentRace;
         setRaceObserver(RunRepository.getRunRepository());
+        RunRepository.getRunRepository().addObserver(new Client());
     }
 
     public void setRaceObserver(Observer o){
