@@ -46,7 +46,7 @@ public class ParIndRace extends Race {
 				_finished.offer(athlete);*/
 				if(dnfcmd.getLane() != 1 && dnfcmd.getLane() != 2) break;
 
-				Athlete athlete = dnfcmd.getLane() == 1?_currentlyRacing1.poll(): _currentlyRacing2.poll();
+				Athlete athlete = (dnfcmd.getLane() == 1)?_currentlyRacing1.poll(): _currentlyRacing2.poll();
 
 				if(athlete != null){
 					athlete.getTimeTracker(Race.RunNumber).setDNF(true);
