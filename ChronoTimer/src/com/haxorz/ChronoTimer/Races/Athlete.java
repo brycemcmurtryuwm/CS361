@@ -29,6 +29,10 @@ public class Athlete {
         RunRepository.addAthlete(raceNumber, this);
     }
 
+    public boolean registeredForRace(int raceNumber){
+        return timesTracked.containsKey(raceNumber);
+    }
+
     public int getNumber(){
         return _number;
     }

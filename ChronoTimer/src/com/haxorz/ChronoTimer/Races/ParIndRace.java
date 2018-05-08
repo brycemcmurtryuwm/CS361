@@ -84,6 +84,9 @@ public class ParIndRace extends Race {
 					COMPETITORS.put(numCmd.Number, athlete);
 				}
 
+				if(athlete.registeredForRace(Race.RunNumber))
+					return;
+
 				athlete.registerForRace(Race.RunNumber);
 
 				if (_didNotStartYet2.size() < _didNotStartYet1.size()) {

@@ -6,6 +6,9 @@ import com.haxorz.ChronoTimer.Races.Athlete;
 import com.haxorz.ChronoTimer.Races.Race;
 import com.haxorz.ChronoTimer.Races.RunRepository;
 import com.haxorz.ChronoTimer.SystemClock;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -22,6 +25,8 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import static com.haxorz.ChronoTimer.Races.RunRepository.*;
 
@@ -31,6 +36,10 @@ public class ChronoTimerUI extends JFrame implements Observer{
 	private JTextPane _screen;
 	private JTextPane _printer = new JTextPane();
 	private String _buffer = "";
+
+	private boolean _coughed = false;
+	private Random _randome = new Random();
+	private static Executor _executor = Executors.newCachedThreadPool();
 
 	private List<JComponent> _components = new ArrayList<>();
     private List<NumberedBox> _numberedBoxes = new ArrayList<>();
@@ -52,6 +61,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 	}
 
 	private void createComponents(){
+		new JFXPanel();
 		JPanel front = new JPanel(new GridLayout(2,3));
 
 		Font font = new Font("SansSerif", Font.PLAIN, 20);
@@ -161,7 +171,9 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		//printer
 		JPanel printerPanel = new JPanel();
 		JButton printerPower = new JButton("Printer Pwr");
-		printerPower.addActionListener(e -> _timer.executeCmd(new GenericCmd(CmdType.PRINTPWR, LocalTime.now())));
+		printerPower.addActionListener(e -> {_timer.executeCmd(new GenericCmd(CmdType.PRINTPWR, LocalTime.now()));
+				_printer.setEnabled(_timer.isPrinterOn());
+		});
 		printerPanel.add(printerPower);
 
 		_printer.setEditable(false);
@@ -368,6 +380,16 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		this.add(back, BorderLayout.SOUTH);
 	}
 
+	private void tryPlaySoundFile(String bip){
+		try {
+			Media hit = new Media(new File(bip).toURI().toString());
+			MediaPlayer mediaPlayer = new MediaPlayer(hit);
+			mediaPlayer.play();
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+	}
+
 	private void setPoweredOn() {
 		boolean isPoweredOn = _timer.isPoweredOn();
 
@@ -377,6 +399,9 @@ public class ChronoTimerUI extends JFrame implements Observer{
 
 		_rdt._updateTimer.stop();
 		_screen.setText(isPoweredOn ? "No Data To Display" : "");
+
+		if(isPoweredOn)
+			_executor.execute(() -> tryPlaySoundFile("res/dial_up.mp3"));
 
 		if(isPoweredOn)
 			_rdt._updateTimer.start();
@@ -462,6 +487,23 @@ public class ChronoTimerUI extends JFrame implements Observer{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			int num = _randome.nextInt(6);
+			String toPlay = "res/numPad" + num + ".m4a";
+
+			if(num == 0 || num == 5)
+			{
+				if(_coughed){
+					toPlay = "res/numPad1.m4a";
+				}
+				else {
+					_coughed = true;
+					toPlay = "res/numPadSP.mp3";
+				}
+			}
+
+			String finalToPlay = toPlay;
+			_executor.execute(() -> tryPlaySoundFile(finalToPlay));
+
 			JButton source = (JButton)e.getSource();
 			_buffer += source.getText();
 

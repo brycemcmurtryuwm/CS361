@@ -62,6 +62,9 @@ public class IndividualRace extends Race {
                     COMPETITORS.put(numCmd.Number, athlete);
                 }
 
+                if(athlete.registeredForRace(Race.RunNumber))
+                    return;
+
                 athlete.registerForRace(Race.RunNumber);
                 _didNotStartYet.add(athlete);
                 break;

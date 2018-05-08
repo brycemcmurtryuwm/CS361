@@ -202,4 +202,7 @@ public class ChronoTimer {
     }
 
 
+    public boolean isPrinterOn() {
+        return printer.isOn();
+    }
 }

@@ -48,4 +48,8 @@ public class Printer {
     public void log(CTCommand cmd) {
         _runnningLog.add(cmd.ToString());
     }
+
+    public boolean isOn() {
+        return _printerOn;
+    }
 }
