@@ -7,7 +7,8 @@ import com.haxorz.ChronoTimer.SystemClock;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
-
+//class that provides means to parse a command and forms as a baseline
+//for actions that all cpmmands will have
 public abstract class CTCommand {
 
     public CmdType CMDType;

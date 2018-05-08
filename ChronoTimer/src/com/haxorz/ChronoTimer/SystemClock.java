@@ -4,6 +4,10 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 
+/**
+ * the class that takes care of the actual timekeeping of
+ * the chronoTimer
+ */
 public class SystemClock {
 
 	private static LocalTime _setTime = LocalTime.now();

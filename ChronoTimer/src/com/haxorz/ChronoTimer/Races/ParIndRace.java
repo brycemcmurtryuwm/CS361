@@ -5,6 +5,10 @@ import com.haxorz.ChronoTimer.Commands.*;
 import java.time.LocalTime;
 import java.util.*;
 
+/**
+ * two lanes of racers going next to each other
+ * used in events such as parallel skiing
+ */
 public class ParIndRace extends Race {
 
 	private Queue<Athlete> _currentlyRacing1;
@@ -30,20 +34,9 @@ public class ParIndRace extends Race {
 	@Override
 	public void executeCmd(CTCommand cmd) {
 		switch (cmd.CMDType){
+			//the athlete in the indicated lane doesn't finish
 			case DNF:
 				DNFCommand dnfcmd = (DNFCommand)cmd;
-
-				/*//creates an athlete with the number of the one to be DNF'd
-				Athlete athlete = new Athlete(dnfcmd.getAthleteNumber());
-
-				athlete = COMPETITORS.get(athlete.getNumber());
-				if(_currentlyRacing1.remove(athlete)) break;
-				if(_currentlyRacing2.remove(athlete)) break;
-				if(_didNotStartYet.remove(athlete)) break;
-
-				//ensures that the athlete isn't in there twice
-				_finished.remove(athlete);
-				_finished.offer(athlete);*/
 				if(dnfcmd.getLane() != 1 && dnfcmd.getLane() != 2) break;
 
 				Athlete athlete = (dnfcmd.getLane() == 1)?_currentlyRacing1.poll(): _currentlyRacing2.poll();
@@ -55,6 +48,7 @@ public class ParIndRace extends Race {
 				}
 				break;
 			case NEWRUN:
+				//extends endRun, thus no break
 			case ENDRUN:
 				_didNotStartYet1.clear();
 				_didNotStartYet2.clear();
@@ -73,6 +67,7 @@ public class ParIndRace extends Race {
 
 				Race.RunNumber++;
 				break;
+			//adds an athlete
 			case NUM:
 				NumCmd numCmd = (NumCmd)cmd;
 
@@ -92,6 +87,7 @@ public class ParIndRace extends Race {
 					_didNotStartYet1.add(athlete);
 				}
 				break;
+			//cancels an athlete
 			case CANCEL:
 				CancelCmd cancelCmd = (CancelCmd) cmd;
 				RunRepository.addToCurrentRun("Athlete " + cancelCmd.AthleteNum + " CANCEL\n");
@@ -116,6 +112,8 @@ public class ParIndRace extends Race {
 					((LinkedList<Athlete>)_didNotStartYet1).add(0,a);
 				}
 				break;
+			//the later athlete outruns the earlier competitor in the
+			//lane specified in the swap command
 			case SWAP:
 				SwapCmd swap = (SwapCmd)cmd;
 				if(swap.ChannelNum == 1){
@@ -177,8 +175,17 @@ public class ParIndRace extends Race {
     }
 
 
-    @Override
+	/**
+	 * @param channelNum channel number where:
+	 *                   1: lane one start
+	 *                   2: lane one finish
+	 *                   3: lane two start
+	 *                   4: lane two finish
+	 * @param timeStamp the time the channel was triggered
+	 */
+	@Override
 	public void channelTriggered(int channelNum, LocalTime timeStamp) {
+		//the same as in individual race
 		if(channelNum == 1)
 		{
 			Athlete athlete = _didNotStartYet1.poll();
@@ -208,6 +215,7 @@ public class ParIndRace extends Race {
 				RunRepository.addToCurrentRun("Athlete ??? TRIG Channel 2\n");
 
 		}
+		//a copy of the first part but with the variables changed
 		if(channelNum == 3)
 		{
 			Athlete athlete = _didNotStartYet2.poll();

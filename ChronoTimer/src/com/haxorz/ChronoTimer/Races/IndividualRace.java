@@ -5,6 +5,11 @@ import com.haxorz.ChronoTimer.Commands.*;
 import java.time.LocalTime;
 import java.util.*;
 
+/**
+ * An atlete starts and is addeded to a queue of currently racing
+ * Thus, the first person to finish is assumed to be the first
+ * person who started (unless there is a DNF command)
+ */
 public class IndividualRace extends Race {
 
     private Queue<Athlete> _currentlyRacing;
@@ -37,6 +42,7 @@ public class IndividualRace extends Race {
                 }
                 break;
             case NEWRUN:
+                //an extension of endRun, thus no break
             case ENDRUN:
                 _didNotStartYet.clear();
 
@@ -51,6 +57,7 @@ public class IndividualRace extends Race {
 
                 Race.RunNumber++;
                 break;
+            //add a racer to the race
             case NUM:
                 NumCmd numCmd = (NumCmd)cmd;
 
@@ -65,6 +72,7 @@ public class IndividualRace extends Race {
                 athlete.registerForRace(Race.RunNumber);
                 _didNotStartYet.add(athlete);
                 break;
+            //remove racer from race
             case CANCEL:
                 CancelCmd cancelCmd = (CancelCmd) cmd;
                 RunRepository.addToCurrentRun("Athlete " + cancelCmd.AthleteNum + " CANCEL\n");
@@ -81,12 +89,14 @@ public class IndividualRace extends Race {
                 a.registerForRace(Race.RunNumber);
                 ((LinkedList<Athlete>)_didNotStartYet).add(0,a);
                 break;
+            //for the case when a later racer outruns an earlier one
             case SWAP:
                 if(_currentlyRacing.size() < 2)
                     break;
 
                 Collections.swap((LinkedList<Athlete>)_currentlyRacing,0,1);
                 break;
+            //clears
             case CLR:
                 ClearCmd clrCmd = (ClearCmd) cmd;
                 RunRepository.addToCurrentRun("Athlete " + clrCmd.Num + " CLEAR\n");
@@ -118,6 +128,10 @@ public class IndividualRace extends Race {
     }
 
 
+    /**
+     * @param channelNum channel to be triggered, 1 is start, 2 is end
+     * @param timeStamp time this channel is triggered
+     */
     @Override
     public void channelTriggered(int channelNum, LocalTime timeStamp) {
         if(channelNum == 1)
