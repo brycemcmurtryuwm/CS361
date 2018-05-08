@@ -35,6 +35,9 @@ public class GrpRace extends Race {
         return RaceType.GRP;
     }
 
+    /**
+     * @param cmd command object parsed from CTCommand
+     */
     @Override
     public void executeCmd(CTCommand cmd) {
         Athlete athlete;

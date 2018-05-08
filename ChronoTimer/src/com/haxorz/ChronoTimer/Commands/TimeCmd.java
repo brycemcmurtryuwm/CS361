@@ -3,6 +3,9 @@ package com.haxorz.ChronoTimer.Commands;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * sets the system time to the time specified
+ */
 public class TimeCmd extends CTCommand {
 
     public LocalTime TimeToSet;

@@ -3,6 +3,10 @@ package com.haxorz.ChronoTimer.Commands;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Exports the race with the given number.
+ * If no race is specified, the current race will be used
+ */
 public class ExportCmd extends CTCommand {
 
     public int RaceNumber;

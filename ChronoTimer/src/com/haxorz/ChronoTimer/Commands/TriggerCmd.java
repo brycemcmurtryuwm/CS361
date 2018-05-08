@@ -3,6 +3,9 @@ package com.haxorz.ChronoTimer.Commands;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * triggers the channel on the channel specified
+ */
 public class TriggerCmd extends CTCommand {
 
     public int Channel;

@@ -5,6 +5,9 @@ import com.haxorz.ChronoTimer.Races.RaceType;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Sets the current race to be a race of the specified type
+ */
 public class EventCmd extends CTCommand {
     public com.haxorz.ChronoTimer.Races.RaceType RaceType;
 

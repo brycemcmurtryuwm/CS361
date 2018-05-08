@@ -3,6 +3,9 @@ package com.haxorz.ChronoTimer.Commands;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * adds an athlete with the given number
+ */
 public class NumCmd extends CTCommand {
 
     public int Number;

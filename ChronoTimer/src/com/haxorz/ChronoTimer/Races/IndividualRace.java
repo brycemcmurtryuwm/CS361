@@ -29,6 +29,9 @@ public class IndividualRace extends Race {
         return RaceType.IND;
     }
 
+    /**
+     * @param cmd command object parsed from CTCommand
+     */
     @Override
     public void executeCmd(CTCommand cmd) {
         switch (cmd.CMDType){

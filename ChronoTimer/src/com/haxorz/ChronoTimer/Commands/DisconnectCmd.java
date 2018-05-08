@@ -3,6 +3,9 @@ package com.haxorz.ChronoTimer.Commands;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * disconnects the sensor connected to the channel provided
+ */
 public class DisconnectCmd extends CTCommand {
 
     public int Channel;

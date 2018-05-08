@@ -33,6 +33,9 @@ public class ParGrpRace extends Race {
 		return RaceType.PARGRP;
 	}
 
+	/**
+	 * @param cmd command object parsed from CTCommand
+	 */
 	@Override
 	public void executeCmd(CTCommand cmd) {
 		switch (cmd.CMDType){
@@ -112,7 +115,7 @@ public class ParGrpRace extends Race {
 
 	@Override
 	protected List<Athlete> athletesInQueue() {
-		return _started? new ArrayList<Athlete>():_group;
+		return _started? new ArrayList<>():_group;
 	}
 
 
