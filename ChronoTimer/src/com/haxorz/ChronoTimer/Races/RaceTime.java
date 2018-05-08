@@ -115,4 +115,18 @@ public class RaceTime {
 
 		return "Athlete " + _athlete.getNumber() + " ELAPSED " + toStringMinutes();
 	}
+
+	public long toMillis() {
+		if(isDNF()){
+			return 0;
+		}
+
+		if(_startTime == null){
+			return 0;
+		}
+
+		Duration d = this.getDuration();
+
+		return d.toMillis();
+	}
 }

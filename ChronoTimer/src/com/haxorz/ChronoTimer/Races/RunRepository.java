@@ -91,15 +91,21 @@ public class RunRepository extends Observable implements Observer {
             obj.AthleteNumber = athlete.getNumber();
             obj.Status = timeTracker.toString();
             obj.Time = timeTracker.toStringMinutes();
+            obj.TimeStamp = String.valueOf(System.nanoTime());
+            obj.State = "finished";
 
-            if(timeTracker.getStartTime() != null && timeTracker.getEndTime() == null){
-                obj.Time = "Currently Racing";
+            if(timeTracker.getStartTime() == null)
+                obj.State = "waiting";
+
+            if(!timeTracker.isDNF() && timeTracker.getStartTime() != null && timeTracker.getEndTime() == null){
+                obj.State = "racing";
+                obj.Time = String.valueOf(timeTracker.toMillis());
             }
 
             if(timeTracker.getStartTime() != null && timeTracker.getEndTime() == null){
                 athleteOrder.add(new Pair<>(Duration.ofDays(99999), obj));
             }
-            else if(timeTracker.getStartTime() == null && timeTracker.getEndTime() == null){
+            else if((timeTracker.getStartTime() == null && timeTracker.getEndTime() == null) || timeTracker.isDNF()){
                 athleteOrder.add(new Pair<>(Duration.ofDays(9999999), obj));
             }
             else {

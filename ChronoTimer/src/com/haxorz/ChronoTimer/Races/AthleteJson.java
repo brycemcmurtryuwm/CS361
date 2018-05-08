@@ -7,5 +7,9 @@ public class AthleteJson {
 
     public String Time;
 
+    public String State;
+
+    public String TimeStamp;
+
     public int Place;
 }

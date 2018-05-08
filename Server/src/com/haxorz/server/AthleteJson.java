@@ -7,6 +7,10 @@ public class AthleteJson implements Comparable<AthleteJson> {
 
     public String Time;
 
+    public String State;
+
+    public String TimeStamp;
+
     public int Place;
 
     @Override
