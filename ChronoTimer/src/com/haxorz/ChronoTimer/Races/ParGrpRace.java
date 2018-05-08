@@ -30,7 +30,7 @@ public class ParGrpRace extends Race {
 
 				if(_startTime == null) return;
 
-				if(dnfcmd.getLane()<0 || dnfcmd.getLane() > 8) break;
+				if(dnfcmd.getLane()<=0 || dnfcmd.getLane() > 8) return;
 
 				Athlete athlete = _group[dnfcmd.getLane()-1];
 
