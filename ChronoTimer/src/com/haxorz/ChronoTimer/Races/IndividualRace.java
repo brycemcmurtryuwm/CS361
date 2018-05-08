@@ -98,7 +98,14 @@ public class IndividualRace extends Race {
                     return;
 
                 a = Race.COMPETITORS.get(clrCmd.Num);
-                _didNotStartYet.remove(a);
+
+                if(!a.registeredForRace(Race.RunNumber))
+                    return;
+
+                if(_didNotStartYet.contains(a)){
+                    a.discardRun(Race.RunNumber);
+                    _didNotStartYet.remove(a);
+                }
                 break;
         }
         this.setChanged();

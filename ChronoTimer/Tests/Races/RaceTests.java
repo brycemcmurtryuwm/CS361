@@ -678,4 +678,202 @@ public class RaceTests {
 		assertEquals(0, _observer.Running);
 		assertEquals(0, _observer.InQueue);
 	}
+
+	@Test
+	public void testPARGrpRace() {
+		_chronoTimer.executeCmd(new EventCmd(LocalTime.now(), RaceType.PARGRP));
+
+		_chronoTimer.executeCmd(new GenericCmd(CmdType.ENDRUN,LocalTime.now()));
+		assertTrue(_observer.Observed);
+		assertEquals(RaceType.PARGRP, _observer.RaceType);
+
+		_observer.Observed = false;
+
+		int raceNumber = Race.RunNumber;
+		_chronoTimer.executeCmd(new GenericCmd(CmdType.NEWRUN, LocalTime.now()));
+		assertTrue(_observer.Observed);
+		_observer.Observed = false;
+		assertEquals(raceNumber +1 , Race.RunNumber);
+
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 77));
+		assertTrue(_observer.Observed);
+		_observer.Observed = false;
+		assertEquals(0, _observer.Finished);
+		assertEquals(0, _observer.Running);
+		assertEquals(1, _observer.InQueue);
+
+		_chronoTimer.executeCmd(new ToggleCmd(LocalTime.now(), 1));
+		_chronoTimer.executeCmd(new ToggleCmd(LocalTime.now(), 2));
+		_chronoTimer.executeCmd(new ToggleCmd(LocalTime.now(), 3));
+		_chronoTimer.executeCmd(new ToggleCmd(LocalTime.now(), 4));
+		_chronoTimer.executeCmd(new ToggleCmd(LocalTime.now(), 5));
+		_chronoTimer.executeCmd(new ToggleCmd(LocalTime.now(), 6));
+		_chronoTimer.executeCmd(new ToggleCmd(LocalTime.now(), 7));
+		_chronoTimer.executeCmd(new ToggleCmd(LocalTime.now(), 8));
+
+		_chronoTimer.executeCmd(new TriggerCmd(LocalTime.now(), 2));
+		_chronoTimer.executeCmd(new TriggerCmd(LocalTime.now(), 1));
+		_chronoTimer.executeCmd(new TriggerCmd(LocalTime.now(), 1));
+		_chronoTimer.executeCmd(new TriggerCmd(LocalTime.now(), 1));
+
+
+
+		_chronoTimer.executeCmd(new TriggerCmd(LocalTime.now(), 2));
+		assertTrue(_observer.Observed);
+		_observer.Observed = false;
+		assertEquals(1, _observer.Finished);
+		assertEquals(0, _observer.Running);
+		assertEquals(0, _observer.InQueue);
+
+
+
+
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 77));
+		assertTrue(!_observer.Observed);
+		_observer.Observed = false;
+		assertEquals(1, _observer.Finished);
+		assertEquals(0, _observer.Running);
+		assertEquals(0, _observer.InQueue);
+
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 78));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 79));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 770));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 779));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 778));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 777));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 776));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 475));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 477));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 476));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 475));
+		//assertTrue(_observer.Observed);
+		_observer.Observed = false;
+		assertEquals(1, _observer.Finished);
+		assertEquals(0, _observer.Running);
+		assertEquals(8, _observer.InQueue);
+
+
+		_chronoTimer.executeCmd(new TriggerCmd(LocalTime.now(), 1));
+		assertTrue(_observer.Observed);
+		_observer.Observed = false;
+		assertEquals(1, _observer.Finished);
+		assertEquals(8, _observer.Running);
+		assertEquals(0, _observer.InQueue);
+
+
+		_chronoTimer.executeCmd(new TriggerCmd(LocalTime.now(), 1));
+		_chronoTimer.executeCmd(new TriggerCmd(LocalTime.now(), 2));
+		_chronoTimer.executeCmd(new TriggerCmd(LocalTime.now(), 3));
+		_chronoTimer.executeCmd(new TriggerCmd(LocalTime.now(), 4));
+		assertTrue(_observer.Observed);
+		_observer.Observed = false;
+		assertEquals(5, _observer.Finished);
+		assertEquals(4, _observer.Running);
+		assertEquals(0, _observer.InQueue);
+
+
+		_chronoTimer.executeCmd(new TriggerCmd(LocalTime.now(), 1));
+		_chronoTimer.executeCmd(new TriggerCmd(LocalTime.now(), 2));
+		_chronoTimer.executeCmd(new TriggerCmd(LocalTime.now(), 3));
+		_chronoTimer.executeCmd(new TriggerCmd(LocalTime.now(), 4));
+		assertTrue(!_observer.Observed);
+		_observer.Observed = false;
+		assertEquals(5, _observer.Finished);
+		assertEquals(4, _observer.Running);
+		assertEquals(0, _observer.InQueue);
+
+
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 178));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 179));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 1770));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 1779));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 1778));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 1777));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 1776));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 1475));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 1477));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 1476));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 1475));
+		assertTrue(!_observer.Observed);
+		_observer.Observed = false;
+		assertEquals(5, _observer.Finished);
+		assertEquals(4, _observer.Running);
+		assertEquals(0, _observer.InQueue);
+
+
+
+		_chronoTimer.executeCmd(new TriggerCmd(LocalTime.now(), 5));
+		_chronoTimer.executeCmd(new TriggerCmd(LocalTime.now(), 6));
+		_chronoTimer.executeCmd(new TriggerCmd(LocalTime.now(), 7));
+		_chronoTimer.executeCmd(new TriggerCmd(LocalTime.now(), 8));
+		assertTrue(_observer.Observed);
+		_observer.Observed = false;
+		assertEquals(9, _observer.Finished);
+		assertEquals(0, _observer.Running);
+		assertEquals(0, _observer.InQueue);
+
+
+
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 178));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 179));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 1770));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 1779));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 1778));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 1777));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 1776));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 1475));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 1477));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 1476));
+		_chronoTimer.executeCmd(new NumCmd(LocalTime.now(), 1475));
+		assertTrue(_observer.Observed);
+		_observer.Observed = false;
+		assertEquals(9, _observer.Finished);
+		assertEquals(0, _observer.Running);
+		assertEquals(8, _observer.InQueue);
+
+
+		_chronoTimer.executeCmd(new DNFCommand(LocalTime.now(), 1));
+		assertTrue(!_observer.Observed);
+		_observer.Observed = false;
+		assertEquals(9, _observer.Finished);
+		assertEquals(0, _observer.Running);
+		assertEquals(8, _observer.InQueue);
+
+
+		_chronoTimer.executeCmd(new CancelCmd(LocalTime.now(), 1));
+		_chronoTimer.executeCmd(new SwapCmd(LocalTime.now()));
+		_chronoTimer.executeCmd(new ClearCmd(LocalTime.now(), 1));
+		assertEquals(9, _observer.Finished);
+		assertEquals(0, _observer.Running);
+		assertEquals(8, _observer.InQueue);
+
+
+
+
+		_chronoTimer.executeCmd(new TriggerCmd(LocalTime.now(), 1));
+		assertTrue(_observer.Observed);
+		_observer.Observed = false;
+		assertEquals(9, _observer.Finished);
+		assertEquals(8, _observer.Running);
+		assertEquals(0, _observer.InQueue);
+
+
+
+
+		_chronoTimer.executeCmd(new DNFCommand(LocalTime.now(), 1));
+		_chronoTimer.executeCmd(new DNFCommand(LocalTime.now(), 2));
+		_chronoTimer.executeCmd(new DNFCommand(LocalTime.now(), 3));
+		_chronoTimer.executeCmd(new DNFCommand(LocalTime.now(), 4));
+		_chronoTimer.executeCmd(new DNFCommand(LocalTime.now(), 5));
+		_chronoTimer.executeCmd(new DNFCommand(LocalTime.now(), 6));
+		_chronoTimer.executeCmd(new DNFCommand(LocalTime.now(), 7));
+		_chronoTimer.executeCmd(new DNFCommand(LocalTime.now(), 8));
+		_chronoTimer.executeCmd(new DNFCommand(LocalTime.now(), 1));
+		assertTrue(_observer.Observed);
+		_observer.Observed = false;
+		assertEquals(17, _observer.Finished);
+		assertEquals(0, _observer.Running);
+		assertEquals(0, _observer.InQueue);
+
+	}
 }

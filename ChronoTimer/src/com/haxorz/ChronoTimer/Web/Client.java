@@ -50,7 +50,7 @@ public class Client implements Observer {
             System.out.println("Return String: " + sb);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Could not connect to Server");
         }
     }
 

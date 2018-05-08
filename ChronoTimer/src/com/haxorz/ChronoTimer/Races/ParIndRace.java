@@ -104,13 +104,17 @@ public class ParIndRace extends Race {
 
 				Athlete a = Race.COMPETITORS.get(cancelCmd.AthleteNum);
 
-				_currentlyRacing1.remove(a);
-				_currentlyRacing2.remove(a);
-				_didNotStartYet1.remove(a);
-				_didNotStartYet2.remove(a);
-				_finished.remove(a);
+				if(a.registeredForRace(Race.RunNumber))
+				{
+					_currentlyRacing1.remove(a);
+					_currentlyRacing2.remove(a);
+					_didNotStartYet1.remove(a);
+					_didNotStartYet2.remove(a);
+					_finished.remove(a);
 
-				a.discardRun(Race.RunNumber);
+					a.discardRun(Race.RunNumber);
+				}
+
 				a.registerForRace(Race.RunNumber);
 
 				if (_didNotStartYet2.size() < _didNotStartYet1.size()) {
@@ -142,8 +146,15 @@ public class ParIndRace extends Race {
 					return;
 
 				a = Race.COMPETITORS.get(clrCmd.Num);
-				_didNotStartYet1.remove(a);
-				_didNotStartYet2.remove(a);
+
+				if(!a.registeredForRace(Race.RunNumber))
+					return;
+
+				if(_didNotStartYet1.contains(a) || _didNotStartYet2.contains(a)){
+					_didNotStartYet1.remove(a);
+					_didNotStartYet2.remove(a);
+					a.discardRun(Race.RunNumber);
+				}
 				break;
 		}
 		this.setChanged();
@@ -159,11 +170,21 @@ public class ParIndRace extends Race {
     public List<Athlete> athletesRunning() {
 		List<Athlete> toReturn = new ArrayList<>();
 
-		for (int i = 0; i < _currentlyRacing1.size(); i++) {
-			toReturn.add(((LinkedList<Athlete>)_currentlyRacing1).get(i));
-			if(i<_currentlyRacing2.size())
-				toReturn.add(((LinkedList<Athlete>)_currentlyRacing2).get(i));
+		if(_currentlyRacing1.size() >= _currentlyRacing2.size()){
+			for (int i = 0; i < _currentlyRacing1.size(); i++) {
+				toReturn.add(((LinkedList<Athlete>)_currentlyRacing1).get(i));
+				if(i<_currentlyRacing2.size())
+					toReturn.add(((LinkedList<Athlete>)_currentlyRacing2).get(i));
+			}
 		}
+		else {
+			for (int i = 0; i < _currentlyRacing2.size(); i++) {
+				toReturn.add(((LinkedList<Athlete>)_currentlyRacing2).get(i));
+				if(i<_currentlyRacing1.size())
+					toReturn.add(((LinkedList<Athlete>)_currentlyRacing1).get(i));
+			}
+		}
+
 		return toReturn;
     }
 
@@ -171,10 +192,19 @@ public class ParIndRace extends Race {
     protected List<Athlete> athletesInQueue() {
         List<Athlete> toReturn = new ArrayList<>();
 
-		for (int i = 0; i < _didNotStartYet1.size(); i++) {
-			toReturn.add(((LinkedList<Athlete>)_didNotStartYet1).get(i));
-			if(i<_didNotStartYet2.size())
+		if(_didNotStartYet1.size() >= _didNotStartYet2.size()){
+			for (int i = 0; i < _didNotStartYet1.size(); i++) {
+				toReturn.add(((LinkedList<Athlete>)_didNotStartYet1).get(i));
+				if(i<_didNotStartYet2.size())
+					toReturn.add(((LinkedList<Athlete>)_didNotStartYet2).get(i));
+			}
+		}
+		else {
+			for (int i = 0; i < _didNotStartYet2.size(); i++) {
 				toReturn.add(((LinkedList<Athlete>)_didNotStartYet2).get(i));
+				if(i<_didNotStartYet1.size())
+					toReturn.add(((LinkedList<Athlete>)_didNotStartYet1).get(i));
+			}
 		}
         return toReturn;
     }
@@ -211,7 +241,7 @@ public class ParIndRace extends Race {
 				RunRepository.addToCurrentRun("Athlete ??? TRIG Channel 2\n");
 
 		}
-		if(channelNum == 3)
+		else if(channelNum == 3)
 		{
 			Athlete athlete = _didNotStartYet2.poll();
 

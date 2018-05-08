@@ -7,20 +7,9 @@ import java.util.*;
 
 public class ParGrpRace extends Race {
 
-	private ArrayList<Athlete> _group;
-	private boolean _started;
-
-	//athletes are copied to finished after they finish
-	//but remain in _group
-	private List<Athlete> _finished;
-
-	public ParGrpRace() {
-		_group = new ArrayList<>(8);
-		_started = false;
-		Athlete[] arr = new Athlete[8];
-		_finished = Arrays.asList(arr);
-
-	}
+	private Athlete[] _group = new Athlete[8];
+	private LocalTime _startTime = null;
+	private List<Athlete> _finished = new ArrayList<>();
 
 	@Override
 	public RaceType getRaceType() {
@@ -31,27 +20,34 @@ public class ParGrpRace extends Race {
 	public void executeCmd(CTCommand cmd) {
 		switch (cmd.CMDType){
 			case DNF:
-				//no function in this race type
+				DNFCommand dnfcmd = (DNFCommand)cmd;
+
+				if(_startTime == null) return;
+
+				if(dnfcmd.getLane()<0 || dnfcmd.getLane() > 8) break;
+
+				Athlete athlete = _group[dnfcmd.getLane()-1];
+
+				if(athlete != null){
+					athlete.getTimeTracker(Race.RunNumber).setDNF(true);
+					RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " DNF\n");
+					_group[dnfcmd.getLane()-1] = null;
+					_finished.add(athlete);
+				}
 				break;
 			case NEWRUN:
 			case ENDRUN:
-				_started = false;
+				_startTime = null;
 
 				//set DNF to any racers who haven't finished
-				for(int i = 0; i < _group.size(); i++) {
-					if(_finished.get(i) == null){
-						_group.get(i).getTimeTracker(Race.RunNumber).setDNF(true);
-					}
+				for (int i = 0; i < _group.length; i++) {
+					Athlete a_group = _group[i];
+					if (a_group != null)
+						a_group.getTimeTracker(Race.RunNumber).setDNF(true);
+					_group[i] = null;
 				}
 
-				//clear everything
-				_group.clear();
-				for(Athlete a:_finished) {
-					a = null;
-				}
-				_started = false;
-
-
+				_finished.clear();
 				RunRepository.EndCurrentRun(Race.RunNumber);
 
 				if(cmd.CMDType == CmdType.ENDRUN)
@@ -60,7 +56,14 @@ public class ParGrpRace extends Race {
 				Race.RunNumber++;
 				break;
 			case NUM:
-				if(_group.size() > 8){
+				int nullCount = 0;
+
+				for (Athlete a : _group){
+					if (a == null)
+						nullCount++;
+				}
+
+				if(nullCount == 0 || _startTime != null){
 					//if more than 8 are added we are just to ignore
 					return;
 				}
@@ -74,8 +77,17 @@ public class ParGrpRace extends Race {
 					COMPETITORS.put(numCmd.Number, a);
 				}
 
-				_group.add(a);
+				if(a.registeredForRace(Race.RunNumber))
+					return;
 
+				a.registerForRace(Race.RunNumber);
+
+				for (int i = 0; i < _group.length; i++) {
+					if(_group[i] == null){
+						_group[i] = a;
+						break;
+					}
+				}
 				break;
 			case CANCEL:
 				//not in this race type
@@ -99,45 +111,72 @@ public class ParGrpRace extends Race {
 	//returns athletes running
 	@Override
 	public List<Athlete> athletesRunning() {
-		return (List<Athlete>)_group.clone();
+		if(_startTime == null)
+			return  new ArrayList<>();
+
+		 ArrayList<Athlete> toReturn = new ArrayList<>();
+
+		 for (Athlete a : _group){
+		 	if(a != null)
+		 		toReturn.add(a);
+		 }
+		 return toReturn;
 	}
 
 	@Override
 	protected List<Athlete> athletesInQueue() {
-		return _started? new ArrayList<Athlete>():_group;
-	}
+		if(_startTime != null)
+			return new ArrayList<>();
+
+		ArrayList<Athlete> toReturn = new ArrayList<>();
+
+		for (Athlete a : _group){
+			if(a != null)
+				toReturn.add(a);
+		}
+		return toReturn;}
 
 
 	@Override
 	public void channelTriggered(int channelNum, LocalTime timeStamp) {
-		if(channelNum == 1 && !_started)
+		if(channelNum == 1 && _startTime == null)
 		{
-			_started = true;
+			_startTime = timeStamp;
 			for(Athlete a:_group) {
+				if(a == null)
+					continue;
+
 				a.getTimeTracker(Race.RunNumber).setStartTime(timeStamp);
 			}
 
-			RunRepository.addToCurrentRun("PARIND race started\n");
+			RunRepository.addToCurrentRun("PARGRP race started\n");
 			this.setChanged();
 			this.notifyObservers();
 			return;
 		}
-		if(!_started) return;
-		if(channelNum > _group.size()) return;
+		if(_startTime == null) return;
+		if(channelNum > 8) return;
 
-		Athlete athlete = _group.get(channelNum);
-		if(athlete == null){
-			RunRepository.addToCurrentRun("Athlete ??? TRIG Channel" + channelNum + "\n");
-		}
-		else{
+		Athlete athlete = _group[channelNum - 1];
+		if(athlete != null){
+			athlete.getTimeTracker(Race.RunNumber).setEndTime(timeStamp);
+			RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " TRIG Channel" + channelNum + " \n");
 			RunRepository.addToCurrentRun("Athlete " + athlete.getNumber() + " ELAPSED " + athlete.getTimeTracker(Race.RunNumber).toStringMinutes() + "\n");
+			_group[channelNum - 1] = null;
 			_finished.add(athlete);
+			this.setChanged();
+			this.notifyObservers();
 		}
-		this.setChanged();
-		this.notifyObservers();
 
+		int nullCount = 0;
 
+		for (Athlete a : _group){
+			if (a == null)
+				nullCount++;
+		}
 
+		if(nullCount == 8)
+			_startTime = null;
 	}
 }
 
