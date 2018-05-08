@@ -90,7 +90,7 @@ public class ChronoTimer {
                         currentRace = new GrpRace();
                         break;
                     case PARGRP:
-                        //TODO IN THE FUTURE NOT NEEDED IN SPRINT 1
+                        currentRace = new ParGrpRace();
                         break;
                 }
 
