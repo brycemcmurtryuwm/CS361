@@ -15,14 +15,14 @@ import java.util.Observer;
 
 public class ChronoTimer {
 
-    private boolean poweredOn = false;
 
+    private boolean poweredOn = false;
     private Race currentRace = new IndividualRace();
     private List<Observer> observers = new ArrayList<>();
 
+    //simulated components of the chronoTimer
     private Channel[] channels = new Channel[12];
     private InputSensor[] sensors = new InputSensor[12];
-
     private Printer printer;
 
     public ChronoTimer(PrintStream out) {
@@ -36,9 +36,10 @@ public class ChronoTimer {
         RunRepository.getRunRepository().addObserver(new Client());
     }
 
+    //used when keeping a live count of the current racers
+    //(as is done in the UI)
     public void setRaceObserver(Observer o){
         currentRace.addObserver(o);
-
         observers.add(o);
     }
 
@@ -58,6 +59,12 @@ public class ChronoTimer {
         Channel.ChannelListener = currentRace;
     }
 
+    /**
+     * Takes a command and fullfils that command on
+     * our chronoTimer
+     *
+     * @param cmd Command parsed from CTCommand
+     */
     public void executeCmd(CTCommand cmd){
         if(cmd == null)
             return;
@@ -123,14 +130,11 @@ public class ChronoTimer {
                 break;
             case PRINT:
                 PrintCmd printCmd = (PrintCmd)cmd;
-
                 if(printCmd.UseCurrentRun){
                     printer.print(RunRepository.getCurrentRun());
                     return;
                 }
-
-                if(!RunRepository.CompletedRuns.containsKey(printCmd.RaceNumber))
-                    return;
+                if(!RunRepository.CompletedRuns.containsKey(printCmd.RaceNumber)) return;
                 printer.print(RunRepository.CompletedRuns.get(printCmd.RaceNumber));
                 break;
             case TIME:
@@ -155,9 +159,7 @@ public class ChronoTimer {
                 break;
             case TRIG:
                 TriggerCmd trig = (TriggerCmd) cmd;
-
                 InputSensor sensor = sensors[trig.Channel -1];
-
                 if(sensor != null)
                     sensor.Triggered(cmd.TimeStamp);
                 else
@@ -179,12 +181,15 @@ public class ChronoTimer {
                 else
                     channels[1].Trigger(cmd.TimeStamp);
                 break;
+
+            //commands that will be passed to the race
             case DNF:
             case NEWRUN:
             case ENDRUN:
             case NUM:
             case CLR:
             default:
+                //passes command to race, assuming it exists
                 if(currentRace != null){
                     currentRace.executeCmd(cmd);
                 }
@@ -195,6 +200,10 @@ public class ChronoTimer {
         return poweredOn;
     }
 
+    /**
+     * sets all of the race's observers no observe
+     * the current race
+     */
     private void setObservers() {
         for(Observer o: observers){
             currentRace.addObserver(o);

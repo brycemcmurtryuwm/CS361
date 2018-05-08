@@ -5,6 +5,12 @@ import com.haxorz.ChronoTimer.Commands.*;
 import java.time.LocalTime;
 import java.util.*;
 
+/**
+ * one start, multiple finishes
+ * used in sports such as track and field sprints
+ *
+ * up to 8 racers
+ */
 public class ParGrpRace extends Race {
 
 	private Athlete[] _group = new Athlete[8];
@@ -36,6 +42,7 @@ public class ParGrpRace extends Race {
 				}
 				break;
 			case NEWRUN:
+				//newRun is an extension of endRun, thus no break
 			case ENDRUN:
 				_startTime = null;
 
@@ -55,6 +62,7 @@ public class ParGrpRace extends Race {
 
 				Race.RunNumber++;
 				break;
+			//add athlete
 			case NUM:
 				int nullCount = 0;
 
@@ -137,6 +145,11 @@ public class ParGrpRace extends Race {
 		return toReturn;}
 
 
+	/**
+	 * @param channelNum channel triggered, 1 to start the race, after that the
+	 *                   channel coresponds to the lane of the racer
+	 * @param timeStamp
+	 */
 	@Override
 	public void channelTriggered(int channelNum, LocalTime timeStamp) {
 		if(channelNum == 1 && _startTime == null)

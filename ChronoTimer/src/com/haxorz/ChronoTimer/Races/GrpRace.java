@@ -8,6 +8,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+/**
+ *  One start time with multiple finishes.
+ *  Upon finish, the finish is connected to
+ *  the nexr "place"
+ */
 public class GrpRace extends Race {
 
     private Queue<Athlete> _finished;
@@ -38,17 +43,19 @@ public class GrpRace extends Race {
                 //No Function in this race type
                 break;
             case NEWRUN:
+                //an extension of endRun, thus no break
             case ENDRUN:
                 //discard unassigned runtimes
                 _runStore.clear();
                 _finished.clear();
+
                 RunRepository.EndCurrentRun(Race.RunNumber);
+
                 _startTime = null;
                 _athleteNum = 0;
 
                 this.setChanged();
                 this.notifyObservers();
-
                 if(cmd.CMDType == CmdType.ENDRUN)
                     break;
 
@@ -124,6 +131,10 @@ public class GrpRace extends Race {
         }
     }
 
+    /**
+     * @param channelNum the channel number triggered, in this case, one or two
+     * @param timeStamp the time the commend was placed
+     */
     @Override
     public void channelTriggered(int channelNum, LocalTime timeStamp) {
         if(channelNum == 1)
