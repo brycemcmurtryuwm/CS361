@@ -118,6 +118,9 @@ public class ChronoTimer {
             case PRINTPWR:
                 printer.PowerPushed(cmd.TimeStamp);
                 break;
+            case LOG:
+                printer.printLog();
+                break;
             case PRINT:
                 PrintCmd printCmd = (PrintCmd)cmd;
 

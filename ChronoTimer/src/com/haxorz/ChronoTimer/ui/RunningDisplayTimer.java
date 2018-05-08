@@ -20,7 +20,8 @@ public class RunningDisplayTimer {
     private class UpdateTimerListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if(_screen.getText() == "" || _screen.getText() == "No Data To Display")
+            String text = _screen.getText();
+            if(text.equals("") || text.equals("No Data To Display") || text.startsWith("Use the numpad to"))
                 return;
 
             _screen.setText(ChronoTimerUI.getRaceDisplayText());

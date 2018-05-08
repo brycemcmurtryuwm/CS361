@@ -181,21 +181,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		functionButton.addActionListener(new FunctionListener());
 		functionButton.setAlignmentX(2);
 		randomButtons.add(functionButton);
-		/* the arrows don't do anything right now
-		JPanel arrows = new JPanel();
-		JButton leftButton = new JButton(""+(char)9668);
-		leftButton.setFont(font);
-		arrows.add(leftButton);
-		JButton rightButton = new JButton(""+(char)9658);
-		rightButton.setFont(font);
-		arrows.add(rightButton);
-		JButton downButton = new JButton(""+(char)9660);
-		downButton.setFont(font);
-		arrows.add(downButton);
-		JButton upButton = new JButton(""+(char)9650);
-		upButton.setFont(font);
-		arrows.add(upButton);
-		randomButtons.add(arrows);*/
+
 		JButton newRaceButton = new JButton("Create Race");
 		newRaceButton.setFont(font);
 		newRaceButton.addActionListener(new NewRaceListener(_timer));
@@ -414,6 +400,9 @@ public class ChronoTimerUI extends JFrame implements Observer{
 
 	@Override
 	public void update(Observable o, Object arg) {
+		if(_numPadState != NumPadState.NumCmd)
+			return;
+
 		_screen.setText(getRaceDisplayText());
 	}
 
@@ -512,7 +501,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			CmdType[] fuctions = {CmdType.RESET, CmdType.TIME, CmdType.DNF, CmdType.CANCEL, CmdType.START, CmdType.FINISH, CmdType.NEWRUN, CmdType.ENDRUN, CmdType.PRINT, CmdType.CLR, CmdType.EXPORT};
+			CmdType[] fuctions = {CmdType.RESET, CmdType.TIME, CmdType.DNF, CmdType.CANCEL, CmdType.START, CmdType.FINISH, CmdType.NEWRUN, CmdType.ENDRUN, CmdType.LOG, CmdType.PRINT, CmdType.CLR, CmdType.EXPORT};
 			CmdType command = (CmdType) JOptionPane.showInputDialog(
 					new JFrame(),
 					"Select Command",
@@ -529,6 +518,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 			switch (command){
 				case RESET:
 					setPoweredOn();
+				case LOG:
 				case START:
 				case FINISH:
 				case NEWRUN:
