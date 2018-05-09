@@ -13,6 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observer;
 
+/**
+ * The central class to the chronoTimer
+ *
+ * Can keep track of the channels, sensors, and the printer
+ */
 public class ChronoTimer {
 
 

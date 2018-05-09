@@ -9,6 +9,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalTime;
 
+/**
+ * An action listener that asks what kind of race the user
+ * would like for the next run
+ */
 public class NewRaceListener implements ActionListener {
 
 	private ChronoTimer _timer;
@@ -18,6 +22,11 @@ public class NewRaceListener implements ActionListener {
 		_timer = timer;
 	}
 
+	/**
+	 * Creates a dialog asking what kind of race to do
+	 *
+	 * @param e the Action Event associated with this event
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		RaceType newRace = (RaceType) JOptionPane.showInputDialog(

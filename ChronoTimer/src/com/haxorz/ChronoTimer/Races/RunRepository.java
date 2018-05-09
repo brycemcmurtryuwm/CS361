@@ -6,6 +6,9 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.util.*;
 
+/**
+ * a class used to keep track of all the athletes who have completed a run
+ */
 public class RunRepository extends Observable implements Observer {
 
     public static final HashMap<Integer, String> CompletedRuns = new HashMap<>();
@@ -40,12 +43,21 @@ public class RunRepository extends Observable implements Observer {
         return currentRun;
     }
 
+    /**
+     * Clears all the runs ran
+     *
+     * Useful upon a system reset
+     */
     public static void clear() {
         clearCurrentRun();
         CompletedRuns.clear();
         AthletesPerRun.clear();
     }
 
+    /**
+     * @param raceNumber the race number they are competing in
+     * @param athlete the athlete to be added
+     */
     public static void addAthlete(int raceNumber, Athlete athlete){
         if(AthletesPerRun.containsKey(raceNumber)){
             List<Athlete> athletes = AthletesPerRun.get(raceNumber);
@@ -63,6 +75,10 @@ public class RunRepository extends Observable implements Observer {
     }
 
 
+    /**
+     * @param raceNumber the race they are to be removed from
+     * @param athlete the athlete to be removed
+     */
     public static void removeAthlete(int raceNumber, Athlete athlete) {
         if(AthletesPerRun.containsKey(raceNumber)){
             List<Athlete> athletes = AthletesPerRun.get(raceNumber);
@@ -71,6 +87,11 @@ public class RunRepository extends Observable implements Observer {
         }
     }
 
+    /**
+     * @param raceNumber the raceNumber to be got
+     * @return a list of AthLete json listing each athlete's
+     *         current status
+     */
     public static List<AthleteJson> getAthleteStatus(int raceNumber){
         if(!AthletesPerRun.containsKey(raceNumber))
             return new ArrayList<>();

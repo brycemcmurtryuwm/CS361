@@ -25,6 +25,9 @@ import java.util.Queue;
 
 import static com.haxorz.ChronoTimer.Races.RunRepository.*;
 
+/**
+ * The UI used as a visual depiction of the chronoTimer
+ */
 public class ChronoTimerUI extends JFrame implements Observer{
 	private ChronoTimer _timer;
 	private JButton[] _numPad = new JButton[12];
@@ -33,10 +36,10 @@ public class ChronoTimerUI extends JFrame implements Observer{
 	private String _buffer = "";
 
 	private List<JComponent> _components = new ArrayList<>();
-    private List<NumberedBox> _numberedBoxes = new ArrayList<>();
+	private List<NumberedBox> _numberedBoxes = new ArrayList<>();
 
-    private NumPadState _numPadState = NumPadState.NumCmd;
-    private String _previousText = "";
+	private NumPadState _numPadState = NumPadState.NumCmd;
+	private String _previousText = "";
 	private RunningDisplayTimer _rdt;
 
 	public ChronoTimerUI(){
@@ -51,6 +54,10 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		setPoweredOn();
 	}
 
+	/**
+	 * Builds the UI via Dark Magic...
+	 * or Swing
+	 */
 	private void createComponents(){
 		JPanel front = new JPanel(new GridLayout(2,3));
 
@@ -181,21 +188,6 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		functionButton.addActionListener(new FunctionListener());
 		functionButton.setAlignmentX(2);
 		randomButtons.add(functionButton);
-		/* the arrows don't do anything right now
-		JPanel arrows = new JPanel();
-		JButton leftButton = new JButton(""+(char)9668);
-		leftButton.setFont(font);
-		arrows.add(leftButton);
-		JButton rightButton = new JButton(""+(char)9658);
-		rightButton.setFont(font);
-		arrows.add(rightButton);
-		JButton downButton = new JButton(""+(char)9660);
-		downButton.setFont(font);
-		arrows.add(downButton);
-		JButton upButton = new JButton(""+(char)9650);
-		upButton.setFont(font);
-		arrows.add(upButton);
-		randomButtons.add(arrows);*/
 		JButton newRaceButton = new JButton("Create Race");
 		newRaceButton.setFont(font);
 		newRaceButton.addActionListener(new NewRaceListener(_timer));
@@ -382,6 +374,9 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		this.add(back, BorderLayout.SOUTH);
 	}
 
+	/**
+	 * Turns on the UI
+	 */
 	private void setPoweredOn() {
 		boolean isPoweredOn = _timer.isPoweredOn();
 
@@ -402,6 +397,11 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		_printer.setText("");
 	}
 
+	/**
+	 * @param c the container whose components will be
+	 *          enabled or disabled
+	 * @param en whether the components shall be enabled
+	 */
 	private void setComponentsEnabled(java.awt.Container c, boolean en) {
 		Component[] components = c.getComponents();
 		for (Component comp: components) {
@@ -417,6 +417,9 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		_screen.setText(getRaceDisplayText());
 	}
 
+	/**
+	 * @return a string depiction the current racers racing
+	 */
 	public static String getRaceDisplayText(){
 		synchronized (Lock){
 			if(InQueue.size()+Running.size()+Finalists.size() == 0 && RaceType != com.haxorz.ChronoTimer.Races.RaceType.GRP){
@@ -508,6 +511,10 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		return sb.toString();
 	}
 
+	/**
+	 * Asks what kind of function the user wants and then may use the num
+	 * pad for number input. Then executes the command on the timer
+	 */
 	private class FunctionListener implements ActionListener{
 
 		@Override

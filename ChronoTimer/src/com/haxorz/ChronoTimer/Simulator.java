@@ -5,10 +5,20 @@ import com.haxorz.ChronoTimer.Commands.CTCommand;
 import java.io.*;
 import java.util.Scanner;
 
+/**
+ * A console interface for our chronoTimer
+ */
 public class Simulator {
     public static boolean EXIT = false;
 
 
+    /**
+     * Reads input from the terminal or a file
+     *
+     * Continually asks for input until asked to quit
+     *
+     * @param args not used
+     */
     public static void main(String[] args){
         while (true){
             System.out.println("To read from a file press '1' to use the console press '2'");
@@ -44,6 +54,11 @@ public class Simulator {
 
     }
 
+    /**
+     * @param out where the output shall be put
+     * @param filePath path to the fie containing
+     *                 the commands to be executed
+     */
     public static void ReadFromFile(PrintStream out, String filePath){
 
         try{
@@ -65,6 +80,12 @@ public class Simulator {
         }
     }
 
+    /**
+     * Read input from the console
+     *
+     * @param in the input stream we read input from
+     * @param out wher to put the output from the timer
+     */
     public static void ReadConsoleInput(InputStream in, PrintStream out){
         ChronoTimer chronoTimer = new ChronoTimer(out);
         Scanner sc = new Scanner(in);
