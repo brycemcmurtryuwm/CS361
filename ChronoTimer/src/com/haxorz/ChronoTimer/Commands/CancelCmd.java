@@ -2,7 +2,10 @@ package com.haxorz.ChronoTimer.Commands;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-//this command cancels whatever athlete is specified in the command
+
+/**
+ * this command cancels whatever athlete is specified in the command
+ */
 public class CancelCmd extends CTCommand {
 
     public int AthleteNum;

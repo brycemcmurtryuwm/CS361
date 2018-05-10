@@ -30,6 +30,9 @@ import java.util.concurrent.Executors;
 
 import static com.haxorz.ChronoTimer.Races.RunRepository.*;
 
+/**
+ * The UI used as a visual depiction of the chronoTimer
+ */
 public class ChronoTimerUI extends JFrame implements Observer{
 	private ChronoTimer _timer;
 	private JButton[] _numPad = new JButton[12];
@@ -42,10 +45,10 @@ public class ChronoTimerUI extends JFrame implements Observer{
 	private static Executor _executor = Executors.newCachedThreadPool();
 
 	private List<JComponent> _components = new ArrayList<>();
-    private List<NumberedBox> _numberedBoxes = new ArrayList<>();
+	private List<NumberedBox> _numberedBoxes = new ArrayList<>();
 
-    private NumPadState _numPadState = NumPadState.NumCmd;
-    private String _previousText = "";
+	private NumPadState _numPadState = NumPadState.NumCmd;
+	private String _previousText = "";
 	private RunningDisplayTimer _rdt;
 
 	public ChronoTimerUI(){
@@ -60,6 +63,10 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		setPoweredOn();
 	}
 
+	/**
+	 * Builds the UI via Dark Magic...
+	 * or Swing
+	 */
 	private void createComponents(){
 		new JFXPanel();
 		JPanel front = new JPanel(new GridLayout(2,3));
@@ -390,6 +397,9 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		}
 	}
 
+	/**
+	 * Turns on the UI
+	 */
 	private void setPoweredOn() {
 		boolean isPoweredOn = _timer.isPoweredOn();
 
@@ -413,6 +423,11 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		_printer.setText("");
 	}
 
+	/**
+	 * @param c the container whose components will be
+	 *          enabled or disabled
+	 * @param en whether the components shall be enabled
+	 */
 	private void setComponentsEnabled(java.awt.Container c, boolean en) {
 		Component[] components = c.getComponents();
 		for (Component comp: components) {
@@ -431,6 +446,9 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		_screen.setText(getRaceDisplayText());
 	}
 
+	/**
+	 * @return a string depiction the current racers racing
+	 */
 	public static String getRaceDisplayText(){
 		synchronized (Lock){
 			if(InQueue.size()+Running.size()+Finalists.size() == 0 && RaceType != com.haxorz.ChronoTimer.Races.RaceType.GRP){
@@ -543,6 +561,10 @@ public class ChronoTimerUI extends JFrame implements Observer{
 		return sb.toString();
 	}
 
+	/**
+	 * Asks what kind of function the user wants and then may use the num
+	 * pad for number input. Then executes the command on the timer
+	 */
 	private class FunctionListener implements ActionListener{
 
 		@Override

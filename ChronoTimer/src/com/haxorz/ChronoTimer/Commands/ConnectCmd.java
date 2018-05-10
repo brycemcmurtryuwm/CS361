@@ -5,6 +5,9 @@ import com.haxorz.ChronoTimer.Hardware.SensorType;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * links the given SensorType to the given challenge
+ */
 public class ConnectCmd extends CTCommand {
 
     public SensorType Sensor;

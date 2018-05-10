@@ -9,6 +9,12 @@ import java.io.IOException;
 
 public class Export {
 
+    /**
+     * Exports the run with the given run number to a file
+     * called "RUN<number>.txt"
+     *
+     * @param runNum the run number that we wish to export
+     */
     public static void SaveRunToFile(int runNum){
         Gson gson = new Gson();
         String json = gson.toJson(RunRepository.getAthleteStatus(runNum));

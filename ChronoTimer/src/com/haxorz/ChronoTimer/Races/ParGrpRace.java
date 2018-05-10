@@ -22,6 +22,9 @@ public class ParGrpRace extends Race {
 		return RaceType.PARGRP;
 	}
 
+	/**
+	 * @param cmd command object parsed from CTCommand
+	 */
 	@Override
 	public void executeCmd(CTCommand cmd) {
 		switch (cmd.CMDType){
@@ -142,7 +145,8 @@ public class ParGrpRace extends Race {
 			if(a != null)
 				toReturn.add(a);
 		}
-		return toReturn;}
+		return toReturn;
+	}
 
 
 	/**

@@ -2,6 +2,9 @@ package com.haxorz.ChronoTimer.Hardware;
 
 import java.time.LocalTime;
 
+/**
+ * Imput sensor that can be connected, disconnected and triggerd
+ */
 public class InputSensor {
 
     public SensorType SensorType;

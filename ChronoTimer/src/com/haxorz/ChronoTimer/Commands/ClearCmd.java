@@ -3,6 +3,9 @@ package com.haxorz.ChronoTimer.Commands;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * deletes the athlete with the given number
+ */
 public class ClearCmd extends CTCommand {
 
     public int Num;

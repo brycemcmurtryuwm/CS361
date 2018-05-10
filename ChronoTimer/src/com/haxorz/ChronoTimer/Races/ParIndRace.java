@@ -11,19 +11,23 @@ import java.util.*;
  */
 public class ParIndRace extends Race {
 
-	private Queue<Athlete> _currentlyRacing1;
-	private Queue<Athlete> _currentlyRacing2;
-
-	private Queue<Athlete> _finished;
+	//the two queues of racers waiting to race
 	private Queue<Athlete> _didNotStartYet1;
 	private Queue<Athlete> _didNotStartYet2;
 
+	//the two lanes of racers currently racing
+	private Queue<Athlete> _currentlyRacing1;
+	private Queue<Athlete> _currentlyRacing2;
+
+	//racers who have finished
+	private Queue<Athlete> _finished;
+
 	public ParIndRace() {
+		_didNotStartYet1 = new LinkedList<>();
+		_didNotStartYet2 = new LinkedList<>();
 		_currentlyRacing1 = new LinkedList<>();
 		_currentlyRacing2 = new LinkedList<>();
 		_finished = new LinkedList<>();
-		_didNotStartYet1 = new LinkedList<>();
-		_didNotStartYet2 = new LinkedList<>();
 	}
 
 	@Override
@@ -31,6 +35,9 @@ public class ParIndRace extends Race {
 		return RaceType.PARIND;
 	}
 
+	/**
+	 * @param cmd command object parsed from CTCommand
+	 */
 	@Override
 	public void executeCmd(CTCommand cmd) {
 		switch (cmd.CMDType){
@@ -47,6 +54,7 @@ public class ParIndRace extends Race {
 					_finished.add(athlete);
 				}
 				break;
+			//sets the last run as finished and makes a new run
 			case NEWRUN:
 				//extends endRun, thus no break
 			case ENDRUN:
@@ -67,7 +75,10 @@ public class ParIndRace extends Race {
 
 				Race.RunNumber++;
 				break;
-			//adds an athlete
+			//adds an athlete, first in lane one
+			//then lane two, and so on, so there
+			//lane one will always have >= than
+			//lane two
 			case NUM:
 				NumCmd numCmd = (NumCmd)cmd;
 
@@ -123,7 +134,8 @@ public class ParIndRace extends Race {
 			//lane specified in the swap command
 			case SWAP:
 				SwapCmd swap = (SwapCmd)cmd;
-				if(swap.ChannelNum == 1||swap.ChannelNum==2){
+
+				if(swap.ChannelNum == 1 || swap.ChannelNum == 2){
 					if(_currentlyRacing1.size() < 2)
 						break;
 
@@ -164,7 +176,10 @@ public class ParIndRace extends Race {
         return new ArrayList<>(_finished);
     }
 
-    @Override
+	/**
+	 * @return a list of all the athletes currently racing
+	 */
+	@Override
     public List<Athlete> athletesRunning() {
 		List<Athlete> toReturn = new ArrayList<>();
 

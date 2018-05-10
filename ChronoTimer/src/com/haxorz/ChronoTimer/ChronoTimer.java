@@ -13,6 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observer;
 
+/**
+ * The central class to the chronoTimer
+ *
+ * Can keep track of the channels, sensors, and the printer
+ */
 public class ChronoTimer {
 
 
@@ -36,13 +41,20 @@ public class ChronoTimer {
         RunRepository.getRunRepository().addObserver(new Client());
     }
 
-    //used when keeping a live count of the current racers
-    //(as is done in the UI)
+    /**
+     * used when keeping a live count of the current racers
+     * (as is done in the UI)
+     * @param o the observer being set
+     */
+    //
     public void setRaceObserver(Observer o){
         currentRace.addObserver(o);
         observers.add(o);
     }
 
+    /**
+     * resets the timing system and removes all tracked races
+     */
     private void reset() {
         Race.COMPETITORS.clear();
         Race.RunNumber = 0;

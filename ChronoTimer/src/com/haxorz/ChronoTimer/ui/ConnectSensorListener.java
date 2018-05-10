@@ -10,6 +10,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalTime;
 
+/**
+ * Action Listener for asking the user what kind of sensor they are connecting
+ */
 public class ConnectSensorListener implements ActionListener {
 
 	private final ChronoTimer _timer;
@@ -19,6 +22,11 @@ public class ConnectSensorListener implements ActionListener {
 		_timer = timer;
 	}
 
+	/**
+	 * Creates a dialog asking what kind of sensor to connect
+	 *
+	 * @param e Action event associated with this event
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		NumberedBox source = (NumberedBox)e.getSource();

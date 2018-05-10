@@ -7,6 +7,9 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * a simulated printer that will "print" to a print stream
+ */
 public class Printer {
 
     private boolean _printerOn = true;
@@ -24,6 +27,11 @@ public class Printer {
         Listener = listener;
     }
 
+    /**
+     * powers on or off the printer
+     *
+     * @param timeStamp time the event is placed
+     */
     public void PowerPushed(LocalTime timeStamp){
         if(Listener != null)
             Listener.hwEventTriggered(HWEventType.PrinterPwr, timeStamp);
@@ -45,6 +53,9 @@ public class Printer {
         }
     }
 
+    /**
+     * @param cmd prints out a command
+     */
     public void log(CTCommand cmd) {
         _runnningLog.add(cmd.ToString());
     }

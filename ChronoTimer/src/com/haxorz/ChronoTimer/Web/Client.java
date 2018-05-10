@@ -11,8 +11,21 @@ import java.net.URL;
 import java.util.Observable;
 import java.util.Observer;
 
+
+/**
+ * The web client used to display the results on the web server
+ */
 public class Client implements Observer {
 
+    /**
+     * updates the web server when called
+     *
+     * as this is observable, this is called whenever a change
+     * is detected in the system
+     *
+     * @param o
+     * @param arg
+     */
     @Override
     public void update(Observable o, Object arg) {
         try {

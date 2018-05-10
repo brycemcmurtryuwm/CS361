@@ -3,6 +3,10 @@ package com.haxorz.ChronoTimer.Commands;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Prints the string of the race with a given number.
+ * If no race is specified the current race will be used
+ */
 public class PrintCmd extends CTCommand {
 
     public int RaceNumber;

@@ -5,6 +5,14 @@ import com.haxorz.ChronoTimer.SystemClock;
 import java.time.Duration;
 import java.time.LocalTime;
 
+/**
+ * an object that is abe to keep track of the time an athlete
+ * started and finished, and if they even finished at all
+ *
+ * times are local so this makes the assumption that the race
+ * takes place in one time zone. If the race crosses time zones,
+ * we recommend setting the system time to UTC to avoid confusion
+ */
 public class RaceTime {
 
 	private LocalTime _startTime;

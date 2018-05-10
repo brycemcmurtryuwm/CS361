@@ -3,6 +3,9 @@ package com.haxorz.ChronoTimer.Commands;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Toggles the channel specified
+ */
 public class ToggleCmd extends CTCommand {
 
     public int Channel;

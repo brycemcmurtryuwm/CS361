@@ -3,6 +3,13 @@ package com.haxorz.ChronoTimer.Commands;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * This command is used then a later racer outruns an earlier one.
+ * Used in Individual and Parallel Individual Race types.
+ *
+ * Will assume channel one unless specified
+ *
+ */
 public class SwapCmd extends CTCommand{
 
     public int ChannelNum;
