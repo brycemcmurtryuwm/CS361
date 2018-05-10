@@ -49,7 +49,7 @@ public class ChronoTimerUI extends JFrame implements Observer{
 	private RunningDisplayTimer _rdt;
 
 	public ChronoTimerUI(){
-		this.setSize(1000,850);
+		this.setSize(1000,900);
 		this.setResizable(false);
 		this.setTitle("ChronoTimer 1009");
 		_timer = new ChronoTimer(new JPanelPrintStream(_printer));
@@ -460,6 +460,10 @@ public class ChronoTimerUI extends JFrame implements Observer{
 							sb.append(SystemClock.toStringMinutes(Duration.between(GRPSTART, SystemClock.now()))).append("\n");
 						break;
 					case PARGRP:
+						sb.append("In Queue: \n");
+						for (int i = 0; i < 3 && i < InQueue.size(); i++) {
+							sb.append(InQueue.get(i)).append("\n");
+						}
 						break;
 				}
 			}

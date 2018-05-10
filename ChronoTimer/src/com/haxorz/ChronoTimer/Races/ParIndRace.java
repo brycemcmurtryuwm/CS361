@@ -123,7 +123,7 @@ public class ParIndRace extends Race {
 			//lane specified in the swap command
 			case SWAP:
 				SwapCmd swap = (SwapCmd)cmd;
-				if(swap.ChannelNum == 1){
+				if(swap.ChannelNum == 1||swap.ChannelNum==2){
 					if(_currentlyRacing1.size() < 2)
 						break;
 
